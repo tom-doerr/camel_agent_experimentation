@@ -1,6 +1,6 @@
 """Command line interface for interacting with the agent"""
 
-import argparse
+import click
 from .demo_tool_usage import setup_tool_agent, ChatAgent
 from .messages import BaseMessage
 
@@ -16,18 +16,11 @@ def process_message(agent: ChatAgent, message: str, verbose: bool = False) -> st
     return output
 
 
+@click.command()
+@click.option("--message", "-m", help="Direct message to send")
+@click.option("--verbose", "-v", is_flag=True, help="Show detailed processing information")
 def main():
-    """Entry point for command line interface"""
-    parser = argparse.ArgumentParser(description="Chat with an AI agent")
-    parser.add_argument("--message", "-m", help="Direct message to send")
-    parser.add_argument(
-        "--verbose",
-        "-v",
-        action="store_true",
-        help="Show detailed processing information",
-    )
-
-    args = parser.parse_args()
+    """Chat with an AI agent - Choose a message or interactive mode"""
     agent = setup_tool_agent()
 
     if args.message:

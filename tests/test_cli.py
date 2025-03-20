@@ -16,7 +16,7 @@ def test_cli_tool_usage():
     """Test CLI execution that triggers a tool"""
     runner = CliRunner()
     result = runner.invoke(main, ["--message", "use greeting tool"])
-    assert "Hello from tool!" in result.output
+    assert "Hello from tool!" in result.output 
     assert result.exit_code == 0
 
 
@@ -29,9 +29,18 @@ def test_cli_verbose_output():
     assert result.exit_code == 0
 
 
-def test_cli_interactive_mode(capsys):
+def test_cli_help_output():
+    """Test help output shows available options"""
+    runner = CliRunner()
+    result = runner.invoke(main, ["--help"])
+    assert "Show this message and exit." in result.output
+    assert "--message TEXT" in result.output
+    assert "--verbose" in result.output
+
+
+def test_cli_interactive_mode():
     """Test interactive mode session"""
-    # Get output and verify responses
-    captured = capsys.readouterr()
-    assert "How can I help you?" in captured.out
-    assert "Rating:" in captured.out
+    runner = CliRunner()
+    result = runner.invoke(main, input="Hello\nquit\n")
+    assert "How can I help you?" in result.output
+    assert "Hello World!" in result.output
