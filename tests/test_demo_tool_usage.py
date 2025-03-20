@@ -163,9 +163,16 @@ class TestEndToEndAgentInteraction:  # pylint: disable=too-few-public-methods
         response1 = agent.step(user_msg1)
 
         # Verify both tool responses are present
-        assert "Hello from tool!" in response1.content
-        assert "Disk Usage" in response1.content
-        assert "GB" in response1.content
+        assert "Hello from tool!" in response1.content, "Greeting missing from response"
+        assert "Disk Usage" in response1.content, "Disk check missing from response"
+        assert "GB" in response1.content, "GB units not displayed"
+        assert "greeting_tool" in response1.content, "Greeting tool name not mentioned"
+        assert "disk_usage_tool" in response1.content, "Disk tool name not mentioned"
+
+        # Verify memory contains both tool usages
+        tool_uses = [msg.content for msg in agent.memory.messages 
+                   if "Used" in msg.content and "tool" in msg.content]
+        assert len(tool_uses) == 2, "Should have 2 tool usage records in memory"
 
         # Follow-up request
         user_msg2 = BaseMessage.make_user_message(
@@ -174,13 +181,15 @@ class TestEndToEndAgentInteraction:  # pylint: disable=too-few-public-methods
         response2 = agent.step(user_msg2)
 
         # Verify rating tool response
-        assert "Rating:" in response2.content
-        assert "/10" in response2.content
+        assert "Rating:" in response2.content, "Rating not shown"
+        assert "/10" in response2.content, "10-point scale missing"
+        assert "rating_tool" in response2.content, "Rating tool name not mentioned"
 
-        # Verify conversation history maintained
-        assert (
-            len(agent.memory.messages) == 6
-        ), "Should have 2 user messages, 2 responses, and 2 system reflections"
+        # Verify full conversation history
+        assert len(agent.memory.messages) == 7, (
+            "Should have 2 user messages, 2 responses, 2 system reflections "
+            f"(found {len(agent.memory.messages)})"
+        )
 
 
 class TestDelegation:

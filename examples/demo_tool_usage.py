@@ -52,25 +52,29 @@ class ChatAgent:
 
         # Check if any tool name is mentioned in the message
         content_lower = message.content.lower()
+        tool_responses = []
+        
         for tool_name, tool_cls in self.tools.items():
             # Split tool name into parts and check if any are in the message
             if any(part in content_lower for part in tool_name.split("_")):
                 tool_response = tool_cls().execute(message.content)
-                response = BaseMessage(
-                    "Assistant",
-                    f"Used {tool_name}: {tool_response}",
-                    role_type="assistant",
-                )
-                self.memory.add_message(response)
-
+                tool_responses.append(f"Used {tool_name}: {tool_response}")
+                
                 # Add self-reflection to memory
-                feedback = BaseMessage(
+                self.memory.add_message(BaseMessage(
                     "System",
                     f"Agent reflected on using {tool_name}: Used {tool_name} successfully",
                     role_type="system",
-                )
-                self.memory.add_message(feedback)
-                return response
+                ))
+
+        if tool_responses:
+            response = BaseMessage(
+                "Assistant",
+                "\n".join(tool_responses),
+                role_type="assistant",
+            )
+            self.memory.add_message(response)
+            return response
 
         # Handle missing context scenario
         if len(message.content.strip()) < 5:  # Simple length-based context check
