@@ -84,17 +84,17 @@ class ChatAgent:
     def _handle_file_operations(self, message: BaseMessage) -> Optional[BaseMessage]:
         """Handle file-related commands, return response or None if not a file command"""
         content = message.content
-        
+
         if content.startswith("add "):
             filename = content.split("add ", 1)[1].strip()
             self.add_to_context(filename)
             return BaseMessage("Assistant", f"Added {filename} to context", "assistant")
-            
+
         if content.startswith("remove "):
             filename = content.split("remove ", 1)[1].strip()
             result = self.remove_from_context(filename)
             return BaseMessage("Assistant", result, "assistant")
-            
+
         if content.startswith("edit "):
             parts = content.split(" ", 2)
             if len(parts) < 3:
@@ -106,7 +106,7 @@ class ChatAgent:
             filename = parts[1].strip()
             content = parts[2].strip("'\"")
             return self.edit_file(filename, content)
-            
+
         return None
 
     def step(self, message: BaseMessage) -> BaseMessage:
