@@ -53,7 +53,16 @@ class ChatAgent:
                 self.memory.add_message(feedback)
                 return response
 
-        response = BaseMessage("Assistant", "Hello World!", role_type="assistant")
+        # Handle missing context scenario
+        if len(message.content.strip()) < 5:  # Simple length-based context check
+            response = BaseMessage(
+                "Assistant",
+                "Could you please provide more details about your request?",
+                role_type="assistant"
+            )
+        else:
+            response = BaseMessage("Assistant", "Hello World!", role_type="assistant")
+            
         self.memory.add_message(response)
         return response
 
@@ -86,16 +95,18 @@ class TextRatingTool(
 
 class DiskUsageTool(BaseTool):  # pylint: disable=too-few-public-methods,abstract-method
     """Tool that checks disk usage statistics.
-    
+
     Attributes:
         name: The name of the tool displayed to the agent
         description: Help text for when to use this tool
     """
-    
+
     name: str = "disk_usage_tool"
     description: str = "Useful for checking disk space usage and available capacity"
-    
-    def execute(self, *args: str, **kwargs: str) -> str:  # pylint: disable=unused-argument
+
+    def execute(
+        self, *args: str, **kwargs: str
+    ) -> str:  # pylint: disable=unused-argument
         """Execute the disk usage check and return formatted statistics."""
         usage = shutil.disk_usage("/")
         percent_used = (usage.used / usage.total) * 100
