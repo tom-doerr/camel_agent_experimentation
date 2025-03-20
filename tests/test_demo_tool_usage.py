@@ -515,3 +515,19 @@ class TestFileContextManagement:
             BaseMessage.make_user_message("User", "remove missing.txt")
         )
         assert "not found" in response.content.lower()
+
+    def test_edit_existing_file(self):
+        """Test agent can edit existing files"""
+        agent = setup_tool_agent()
+        # Create and edit file
+        agent.step(BaseMessage.make_user_message("User", "add test.txt"))
+        response = agent.step(BaseMessage.make_user_message("User", "edit test.txt 'Hello World'"))
+        assert "Updated test.txt" in response.content
+        with open("test.txt") as f:
+            assert "Hello World" in f.read()
+
+    def test_edit_nonexistent_file(self):
+        """Test editing non-existent file returns error"""
+        agent = setup_tool_agent()
+        response = agent.step(BaseMessage.make_user_message("User", "edit missing.txt 'content'"))
+        assert "not found" in response.content.lower()
