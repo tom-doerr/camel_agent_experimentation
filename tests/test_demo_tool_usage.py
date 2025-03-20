@@ -108,6 +108,16 @@ def test_agent_initialization():
     agent = ChatAgent(memory=memory, tools=[])
     assert isinstance(agent, ChatAgent), "Should create ChatAgent instance"
     assert len(agent.tools) == 0, "Agent should have no tools by default"
+    assert agent.memory is memory, "Agent should reference the provided memory instance"
+
+def test_shared_memory_initialization():
+    """Test multiple agents sharing the same memory instance"""
+    memory = ChatHistoryMemory()
+    agent1 = ChatAgent(memory=memory, tools=[GreetingTool])
+    agent2 = ChatAgent(memory=memory, tools=[])
+    
+    assert agent1.memory is agent2.memory, "Agents should share the same memory instance"
+    assert len(memory.messages) == 0, "Shared memory should start empty"
 
 
 class TestTextRatingTool:
@@ -357,8 +367,9 @@ class TestDelegation:
         agent1.step(msg)
 
         # Verify Agent2 sees the tool usage in shared memory
-        assert any("greeting_tool" in m.content for m in agent2.memory.messages)
-        assert len(agent2.memory.messages) == 4  # user, system, system, assistant
+        assert any("greeting_tool" in m.content for m in agent2.memory.messages), "Tool usage not found in shared memory"
+        # Should have 3 messages: user input, system tool usage, assistant response
+        assert len(agent2.memory.messages) == 3, f"Expected 3 messages but got {len(agent2.memory.messages)}"
 
     def test_delegation_with_shared_memory(self):
         """Test delegation maintains shared memory context"""
