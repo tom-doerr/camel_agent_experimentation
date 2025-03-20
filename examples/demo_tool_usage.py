@@ -1,9 +1,10 @@
 from camel.agents import ChatAgent
-from camel.memory import ChatHistoryMemory
+from camel.agents.memory import ChatHistoryMemory
 from camel.models import ModelFactory
 from camel.messages import BaseMessage
-from camel.tools import BaseTool
+from camel.agents.tools import BaseTool
 
+# pylint: disable=too-few-public-methods
 class GreetingTool(BaseTool):
     """Simple greeting tool that returns a fixed message."""
     
@@ -15,8 +16,8 @@ def setup_tool_agent():
     """Set up and return a ChatAgent configured with tools."""
     memory = ChatHistoryMemory(window_size=10)
     model = ModelFactory.create(
-        model_type="openai",
-        model_config={"model": "gpt-4"}  # type: ignore
+        model_platform="openai",
+        model_config_dict={"model": "gpt-4"}
     )
     agent = ChatAgent(
         model=model,
