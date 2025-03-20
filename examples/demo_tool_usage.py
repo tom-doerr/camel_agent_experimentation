@@ -30,10 +30,12 @@ class ChatAgent:
         """Process a message and return response"""
         self.memory.add_message(message)
 
-        # Simple tool selection logic for demo
-        if "greeting_tool" in message.content.lower():
-            tool_response = self.tools["greeting_tool"]().execute()
-            return BaseMessage("Assistant", f"Used greeting_tool: {tool_response}")
+        # Check if any tool name is mentioned in the message
+        content_lower = message.content.lower()
+        for tool_name, tool_cls in self.tools.items():
+            if tool_name in content_lower:
+                tool_response = tool_cls().execute()
+                return BaseMessage("Assistant", f"Used {tool_name}: {tool_response}", role_type="assistant")
 
         return BaseMessage("Assistant", "I need help understanding the request")
 
