@@ -1,6 +1,6 @@
 """Test command line interface for agent interaction"""
 from click.testing import CliRunner
-from examples import cli, setup_tool_agent
+import examples.cli as cli
 
 def test_cli_basic_execution():
     """Test basic CLI execution with a message"""
