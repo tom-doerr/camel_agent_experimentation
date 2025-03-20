@@ -321,7 +321,7 @@ class TestEndToEndAgentInterface:
             "User", 
             "Private: 12345, Public: 67890 [STORE ONLY PUBLIC]"
         )
-        response = agent.step(msg)
+        agent.step(msg)
         
         # Verify memory contains only public data
         memory_content = " ".join(msg.content for msg in agent.memory.messages)
@@ -335,7 +335,7 @@ class TestEndToEndAgentInterface:
         # Send long message
         long_text = " ".join(["foo"] * 50)
         msg = BaseMessage.make_user_message("User", f"{long_text} [SUMMARIZE]")
-        response = agent.step(msg)
+        agent.step(msg)
         
         # Verify memory contains summary
         assert any(
