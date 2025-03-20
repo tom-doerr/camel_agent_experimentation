@@ -158,7 +158,7 @@ class TestDiskUsageTool:
 
 class TestEndToEndAgentInterface:
     """End-to-end tests for core agent interface behavior"""
-    
+
     def __init__(self):
         """Initialize test case"""
         super().__init__()
@@ -201,13 +201,13 @@ class TestEndToEndAgentInterface:
         """Test agent can combine multiple tool responses in one message"""
         user_msg = BaseMessage.make_user_message(
             "User",
-            "Use greeting_tool, disk_usage_tool and rating_tool on: 'Sample text'"
+            "Use greeting_tool, disk_usage_tool and rating_tool on: 'Sample text'",
         )
         response = self.agent.step(user_msg)
 
         # Verify all tools responded
         self.assert_tool_used(response, "greeting_tool")
-        self.assert_tool_used(response, "disk_usage_tool") 
+        self.assert_tool_used(response, "disk_usage_tool")
         self.assert_tool_used(response, "rating_tool")
 
     def test_delegation_workflow(self):
@@ -230,7 +230,6 @@ class TestEndToEndAgentInterface:
         roles_present = {msg.role_type for msg in memory.messages}
         assert "system" in roles_present, "Missing system messages"
         assert "assistant" in roles_present, "Missing assistant responses"
-
 
     def test_tool_usage_response_flow(self):
         """Test complete flow from user message to tool usage response"""
@@ -292,6 +291,57 @@ class TestEndToEndAgentInterface:
             msg.role_type == "system" and "error" in msg.content.lower()
             for msg in agent.memory.messages
         ), "Missing error system message"
+
+    def test_agent_memory_control(self):
+        """Test agent can decide when to update memory"""
+        agent = setup_tool_agent()
+        
+        # First message with instruction to not store
+        msg1 = BaseMessage.make_user_message("User", "Remember this secret: 12345 [DO NOT STORE]")
+        response1 = agent.step(msg1)
+        
+        # Verify message was processed but not stored
+        assert "12345" in response1.content
+        assert not any("12345" in msg.content for msg in agent.memory.messages)
+
+        # Second message with normal storage
+        msg2 = BaseMessage.make_user_message("User", "Remember this public: 67890")
+        response2 = agent.step(msg2)
+        
+        # Verify message was stored
+        assert "67890" in response2.content
+        assert any("67890" in msg.content for msg in agent.memory.messages)
+
+    def test_agent_memory_filtering(self):
+        """Test agent can filter what gets stored in memory"""
+        agent = setup_tool_agent()
+        
+        # Send message with mixed content
+        msg = BaseMessage.make_user_message(
+            "User", 
+            "Private: 12345, Public: 67890 [STORE ONLY PUBLIC]"
+        )
+        agent.step(msg)
+        
+        # Verify memory contains only public data
+        memory_content = " ".join(msg.content for msg in agent.memory.messages)
+        assert "67890" in memory_content
+        assert "12345" not in memory_content
+
+    def test_agent_memory_summarization(self):
+        """Test agent can summarize instead of storing verbatim"""
+        agent = setup_tool_agent()
+        
+        # Send long message
+        long_text = " ".join(["foo"] * 50)
+        msg = BaseMessage.make_user_message("User", f"{long_text} [SUMMARIZE]")
+        agent.step(msg)
+        
+        # Verify memory contains summary
+        assert any(
+            "summary" in msg.content.lower() and len(msg.content) < 50
+            for msg in agent.memory.messages
+        ), "Memory should contain summarized version"
 
 
 class TestDelegation:
