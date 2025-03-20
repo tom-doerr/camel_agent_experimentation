@@ -23,7 +23,7 @@ class ChatAgent:
 
     def __init__(self, memory: ChatHistoryMemory, tools: List[Any]):
         self.memory = memory
-        self.tools = {tool().name: tool for tool in tools}  # Fixed tool registration
+        # Store tools by name with class references
         self.tools = {tool.name: tool for tool in tools}
 
     def step(self, message: BaseMessage) -> BaseMessage:

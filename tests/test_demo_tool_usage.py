@@ -6,6 +6,11 @@ sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from examples.demo_tool_usage import GreetingTool, setup_tool_agent, BaseMessage
 
 
+def test_tool_presence():
+    """Test that the agent is initialized with the correct tool."""
+    agent = setup_tool_agent()
+    assert "greeting_tool" in agent.tools, "Greeting tool not registered"
+
 def test_tool_usage_agent():
     """Test that the agent can use a simple greeting tool."""
     # Setup
