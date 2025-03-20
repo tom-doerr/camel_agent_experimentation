@@ -1,12 +1,8 @@
-from camel.messages import BaseMessage
-
-# Fix import path for examples
 import sys
 import os
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
-# pylint: disable=import-error,no-name-in-module
 from examples.demo_tool_usage import GreetingTool, setup_tool_agent
 
 
