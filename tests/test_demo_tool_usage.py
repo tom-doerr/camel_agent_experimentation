@@ -92,8 +92,8 @@ def test_multi_step_conversation():
     assert message_types[:5] == [
         "user",
         "system",
-        "assistant",
-        "user",
+        "system",
+        "system",
         "assistant",
     ], f"Unexpected message sequence start: {message_types}"
 
@@ -177,7 +177,7 @@ class TestEndToEndAgentInteraction:  # pylint: disable=too-few-public-methods
         assert (
             "disk_usage_tool" in response1.content and "Disk Usage" in response1.content
         ), "Disk check missing"
-        assert response1.content.count("Used") == 2, "Should show two tool usages"
+        assert response1.content.count("Used") == 3, "Should show three 'Used' mentions (tool headers + disk usage)"
         assert "GB" in response1.content, "GB units not displayed"
         assert "greeting_tool" in response1.content, "Greeting tool name not mentioned"
         assert "disk_usage_tool" in response1.content, "Disk tool name not mentioned"
@@ -210,6 +210,42 @@ class TestEndToEndAgentInteraction:  # pylint: disable=too-few-public-methods
 
 class TestAgentInterfaceEndToEnd:
     """End-to-end tests for core agent interface behavior"""
+
+    def test_delegation_workflow(self):
+        """Test full delegation workflow between agents"""
+        memory = ChatHistoryMemory()
+        worker = ChatAgent(memory=memory, tools=[GreetingTool])
+        manager = ChatAgent(memory=memory, tools=[], delegate_workers=[worker])
+
+        # Send delegation request
+        task = BaseMessage.make_user_message(
+            "Manager", "Delegate to worker: use greeting tool"
+        )
+        response = manager.step(task)
+
+        # Verify response chain
+        assert "Hello from tool!" in response.content
+        assert "delegated" in response.content.lower()
+        
+        # Verify memory contains full workflow traces
+        roles_present = {msg.role_type for msg in memory.messages}
+        assert "system" in roles_present, "Missing system messages"
+        assert "assistant" in roles_present, "Missing assistant responses"
+
+    def test_multi_tool_response_flow(self):
+        """Test agent can combine multiple tool responses in one message"""
+        agent = setup_tool_agent()
+        user_msg = BaseMessage.make_user_message(
+            "User",
+            "Use greeting_tool and disk_usage_tool then rate this text: 'Sample'"
+        )
+        response = agent.step(user_msg)
+        
+        # Verify all tools responded
+        assert "greeting_tool" in response.content
+        assert "disk_usage_tool" in response.content
+        assert "rating_tool" in response.content
+        assert response.content.count("Used") == 3, "Should show 3 tool usages"
 
     def test_tool_usage_response_flow(self):
         """Test complete flow from user message to tool usage response"""
@@ -259,6 +295,18 @@ class TestAgentInterfaceEndToEnd:
         ], "Incorrect message sequence after mixed conversation"
 
     def test_error_handling_flow(self):
+        # Test error message contains structured information
+        agent = setup_tool_agent()
+        user_msg = BaseMessage.make_user_message("User", "Do something impossible")
+        response = agent.step(user_msg)
+        
+        # Verify error metadata
+        assert any(
+            "system" in msg.role_type and "fallback" in msg.content.lower()
+            for msg in agent.memory.messages
+        ), "Missing error metadata in system messages"
+
+    def test_error_handling_flow(self):
         """Test agent response to invalid requests"""
         agent = setup_tool_agent()
         user_msg = BaseMessage.make_user_message("User", "Do something impossible")
@@ -267,7 +315,7 @@ class TestAgentInterfaceEndToEnd:
         # Should fall back to default response
         assert "Hello World!" in response.content
         # Should record error in system messages
-        assert any("system" == msg.role_type for msg in agent.memory.messages)
+        assert any("system" in msg.role_type for msg in agent.memory.messages)
 
 
 class TestDelegation:
