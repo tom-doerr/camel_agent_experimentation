@@ -7,7 +7,6 @@ from .demo_tool_usage import (
     ChatHistoryMemory,
 )
 from .messages import BaseMessage
-from . import demo_tool_usage, messages
 
 __all__ = [
     "GreetingTool",
@@ -15,6 +14,4 @@ __all__ = [
     "BaseMessage",
     "ChatAgent",
     "ChatHistoryMemory",
-    "demo_tool_usage",
-    "messages",
 ]
