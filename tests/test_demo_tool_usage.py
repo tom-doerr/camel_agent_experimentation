@@ -5,11 +5,11 @@ import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from examples import (
-    BaseMessage, 
-    GreetingTool, 
+    BaseMessage,
+    GreetingTool,
     setup_tool_agent,
     ChatAgent,
-    ChatHistoryMemory
+    ChatHistoryMemory,
 )
 
 
@@ -47,6 +47,7 @@ def test_non_tool_usage_response():
     response = agent.step(user_msg)
     assert "Hello World!" in response.content, "Should show hello world response"
     assert "greeting_tool" not in response.content, "Should not mention tools"
+
 
 def test_agent_initialization():
     """Test basic agent creation with empty tools"""
