@@ -19,7 +19,7 @@ def process_message(agent: ChatAgent, message: str, verbose: bool = False) -> st
 @click.command()
 @click.option("--message", "-m", help="Direct message to send")
 @click.option("--verbose", "-v", is_flag=True, help="Show detailed processing information")
-def main():
+def main(message, verbose):
     """Chat with an AI agent - Choose a message or interactive mode"""
     agent = setup_tool_agent()
 
@@ -32,7 +32,7 @@ def main():
                 message = input("> ")
                 if message.lower() in ["exit", "quit"]:
                     break
-                print(process_message(agent, message, args.verbose))
+                print(process_message(agent, message, verbose))
             except KeyboardInterrupt:
                 print("\nGoodbye!")
                 break
