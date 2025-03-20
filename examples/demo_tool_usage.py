@@ -93,5 +93,5 @@ if __name__ == "__main__":
     user_input = BaseMessage.make_user_message(
         role_name="User", content="Please use the greeting tool to say hello"
     )
-    response = demo_agent.step(user_input)
-    print(f"\nAgent Response:\n{response.content}")
+    demo_response = demo_agent.step(user_input)
+    print(f"\nAgent Response:\n{demo_response.content}")
