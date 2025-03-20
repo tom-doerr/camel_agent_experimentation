@@ -59,12 +59,14 @@ class BaseTool:
         raise NotImplementedError
 
 
-class TextRatingTool(BaseTool):  # pylint: disable=too-few-public-methods,abstract-method
+class TextRatingTool(
+    BaseTool
+):  # pylint: disable=too-few-public-methods,abstract-method
     """Tool that analyzes text complexity and provides a rating."""
-    
+
     name: str = "rating_tool"
     description: str = "Useful for rating text complexity from 1-10 based on length"
-    
+
     def execute(self, *args: str, **kwargs: str) -> str:
         """Analyze text and return a rating."""
         text = args[0] if args else ""
