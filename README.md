@@ -1,7 +1,7 @@
 # CAMEL Agent Python Package
 
-### Overview 
-A properly packaged Python implementation of CAMEL agent with tool usage capabilities.
+### Overview
+A properly packaged Python implementation of the CAMEL agent with tool usage capabilities.
 
 ## Features
 
