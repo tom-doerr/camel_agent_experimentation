@@ -41,6 +41,24 @@ def test_cli_help_output():
 def test_cli_interactive_mode():
     """Test interactive mode session"""
     runner = CliRunner()
-    result = runner.invoke(main, input="Hello\nquit\n")
+    result = runner.invoke(main, input="Hello\nhow are you?\nquit\n")
     assert "How can I help you?" in result.output
     assert "Hello World!" in result.output
+    assert "how are you?" in result.output
+    assert "quit" not in result.output  # Should not process quit as a message
+
+
+def test_cli_no_message():
+    """Test CLI with no message or interactive mode"""
+    runner = CliRunner()
+    result = runner.invoke(main, [])
+    assert "How can I help you?" in result.output
+    assert result.exit_code == 0
+
+
+def test_cli_invalid_input():
+    """Test empty message handling"""
+    runner = CliRunner()
+    result = runner.invoke(main, ["--message", ""])
+    assert "Received empty message" in result.output
+    assert result.exit_code == 1
