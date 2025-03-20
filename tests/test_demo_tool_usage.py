@@ -142,27 +142,31 @@ class TestDiskUsageTool:
 
 class TestDelegation:
     """Test agent-to-agent delegation"""
-    
+
     def test_agent_creation_with_delegation(self):
         """Test agent can be initialized with delegation ability"""
         memory = ChatHistoryMemory()
         worker = ChatAgent(memory=memory, tools=[])
         manager = ChatAgent(memory=memory, tools=[], delegate_workers=[worker])
-        
-        assert hasattr(manager, 'delegate_workers'), "Manager should have workers list"
+
+        assert hasattr(manager, "delegate_workers"), "Manager should have workers list"
         assert len(manager.delegate_workers) == 1, "Manager should have 1 worker"
-        assert isinstance(manager.delegate_workers[0], ChatAgent), "Worker should be agent"
-    
+        assert isinstance(
+            manager.delegate_workers[0], ChatAgent
+        ), "Worker should be agent"
+
     def test_simple_delegation(self):
         """Test manager can delegate task to worker"""
         memory = ChatHistoryMemory()
         worker = ChatAgent(memory=memory, tools=[GreetingTool()])
         manager = ChatAgent(memory=memory, tools=[], delegate_workers=[worker])
-        
+
         task = BaseMessage.make_user_message(
             "Manager", "Delegate to worker: use greeting tool"
         )
         response = manager.step(task)
-        
+
         assert "Hello from tool!" in response.content, "Worker should handle task"
-        assert "delegated to worker" in response.content.lower(), "Should mention delegation"
+        assert (
+            "delegated to worker" in response.content.lower()
+        ), "Should mention delegation"
