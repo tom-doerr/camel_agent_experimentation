@@ -1,9 +1,12 @@
 import sys
 import os
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+# Add project root and examples directory to path
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../examples")))
 
-from examples.demo_tool_usage import GreetingTool, setup_tool_agent, BaseMessage
+from demo_tool_usage import GreetingTool, setup_tool_agent
+from messages import BaseMessage
 
 
 def test_tool_presence():
