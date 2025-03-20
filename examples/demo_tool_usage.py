@@ -94,9 +94,9 @@ class ChatAgent:
         try:
             if len(message.content.strip()) < 5:
                 raise ValueError("Insufficient context")
-                
+
             response = BaseMessage("Assistant", "Hello World!", role_type="assistant")
-            
+
         except Exception as e:
             self.memory.add_message(
                 BaseMessage(
