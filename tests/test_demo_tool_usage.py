@@ -120,3 +120,20 @@ class TestGreetingTool:
         tool = GreetingTool()
         result = tool.execute()
         assert result == "Hello from tool!", "Incorrect tool output"
+
+
+class TestDiskUsageTool:
+    def test_tool_properties(self):
+        """Test disk usage tool metadata."""
+        tool = DiskUsageTool()
+        assert tool.name == "disk_usage_tool"
+        assert "disk space" in tool.description.lower()
+
+    def test_tool_execution(self):
+        """Test disk usage tool execution."""
+        tool = DiskUsageTool()
+        result = tool.execute()
+        assert "Total" in result
+        assert "Used" in result
+        assert "Free" in result
+        assert "%" in result

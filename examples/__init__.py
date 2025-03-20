@@ -12,6 +12,7 @@ from .messages import BaseMessage
 __all__ = [
     "GreetingTool",
     "TextRatingTool",
+    "DiskUsageTool",
     "setup_tool_agent",
     "BaseMessage",
     "ChatAgent",
