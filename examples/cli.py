@@ -7,6 +7,8 @@ from .messages import BaseMessage
 
 def process_message(agent: ChatAgent, message: str, verbose: bool = False) -> str:
     """Process a single message through the agent"""
+    if not message.strip():
+        raise click.UsageError("Received empty message")
     user_msg = BaseMessage.make_user_message(role_name="User", content=message)
     response = agent.step(user_msg)
 
@@ -48,7 +50,7 @@ def main(message=None, verbose=False):
                 if message.lower() in ["exit", "quit"]:
                     break
                 print(process_message(agent, message, verbose))
-            except KeyboardInterrupt:
+            except (KeyboardInterrupt, EOFError):
                 print("\nGoodbye!")
                 break
 
