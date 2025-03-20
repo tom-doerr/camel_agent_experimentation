@@ -40,7 +40,7 @@ def main(message=None, verbose=False):
     """
     agent = setup_tool_agent()
 
-    if message:  # Direct message mode
+    if message is not None:  # Direct message mode (check for option presence)
         if not message.strip():
             raise click.UsageError("Message cannot be empty when using --message")
         click.echo(process_message(agent, message, verbose))

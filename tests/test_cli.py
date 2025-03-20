@@ -80,3 +80,12 @@ def test_cli_version():
     runner = CliRunner()
     result = runner.invoke(main, ["--version"])
     assert "0.1.0" in result.output
+
+
+def test_cli_disk_usage_tool():
+    """Test disk usage tool integration through CLI"""
+    runner = CliRunner()
+    result = runner.invoke(main, ["--message", "check disk usage"])
+    assert "Disk Usage" in result.output
+    assert "%" in result.output
+    assert result.exit_code == 0
