@@ -1,4 +1,5 @@
 from typing import Any, List
+import shutil
 from examples.messages import BaseMessage
 
 
@@ -83,6 +84,29 @@ class TextRatingTool(
         return f"Rating: {rating}/10 (based on {word_count} words)"
 
 
+class DiskUsageTool(BaseTool):  # pylint: disable=too-few-public-methods,abstract-method
+    """Tool that checks disk usage statistics.
+    
+    Attributes:
+        name: The name of the tool displayed to the agent
+        description: Help text for when to use this tool
+    """
+    
+    name: str = "disk_usage_tool"
+    description: str = "Useful for checking disk space usage and available capacity"
+    
+    def execute(self, *args: str, **kwargs: str) -> str:  # pylint: disable=unused-argument
+        """Execute the disk usage check and return formatted statistics."""
+        usage = shutil.disk_usage("/")
+        percent_used = (usage.used / usage.total) * 100
+        return (
+            f"Disk Usage: {percent_used:.1f}% used\n"
+            f"Total: {usage.total // (1024**3)}GB, "
+            f"Used: {usage.used // (1024**3)}GB, "
+            f"Free: {usage.free // (1024**3)}GB"
+        )
+
+
 class GreetingTool(BaseTool):  # pylint: disable=too-few-public-methods,abstract-method
     """Tool that returns a fixed greeting message.
 
@@ -108,7 +132,7 @@ def setup_tool_agent() -> ChatAgent:
         ChatAgent: Agent configured with greeting tool and memory
     """
     memory = ChatHistoryMemory(window_size=10)
-    return ChatAgent(memory=memory, tools=[GreetingTool, TextRatingTool])
+    return ChatAgent(memory=memory, tools=[GreetingTool, TextRatingTool, DiskUsageTool])
 
 
 if __name__ == "__main__":

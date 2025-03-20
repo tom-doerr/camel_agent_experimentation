@@ -11,6 +11,7 @@ sys.path.insert(0, examples_dir)
 from examples.demo_tool_usage import (
     GreetingTool,
     TextRatingTool,
+    DiskUsageTool,
     setup_tool_agent,
     ChatAgent,
     ChatHistoryMemory,
@@ -78,7 +79,9 @@ def test_multi_step_conversation():
     response2 = agent.step(msg2)
 
     # Verify both messages and responses are in memory
-    assert len(agent.memory.messages) == 5, "Should have 2 user messages + 2 responses + 1 system reflection"
+    assert (
+        len(agent.memory.messages) == 5
+    ), "Should have 2 user messages + 2 responses + 1 system reflection"
     assert "Hello from tool!" in response1.content
     assert "Hello World!" in response2.content
 
@@ -118,3 +121,20 @@ class TestGreetingTool:
         tool = GreetingTool()
         result = tool.execute()
         assert result == "Hello from tool!", "Incorrect tool output"
+
+
+class TestDiskUsageTool:
+    def test_tool_properties(self):
+        """Test disk usage tool metadata."""
+        tool = DiskUsageTool()
+        assert tool.name == "disk_usage_tool"
+        assert "disk space" in tool.description.lower()
+
+    def test_tool_execution(self):
+        """Test disk usage tool execution."""
+        tool = DiskUsageTool()
+        result = tool.execute()
+        assert "Total" in result
+        assert "Used" in result
+        assert "Free" in result
+        assert "%" in result
