@@ -22,7 +22,12 @@ class ChatHistoryMemory:
 class ChatAgent:
     """Minimal agent implementation with tool support"""
 
-    def __init__(self, memory: ChatHistoryMemory, tools: List[Any], delegate_workers: List[Any] = None):
+    def __init__(
+        self,
+        memory: ChatHistoryMemory,
+        tools: List[Any],
+        delegate_workers: List[Any] = None,
+    ):
         self.memory = memory
         # Store tools by name with class references
         self.tools = {tool.name: tool for tool in tools}
@@ -72,11 +77,11 @@ class ChatAgent:
             response = BaseMessage(
                 "Assistant",
                 "Could you please provide more details about your request?",
-                role_type="assistant"
+                role_type="assistant",
             )
         else:
             response = BaseMessage("Assistant", "Hello World!", role_type="assistant")
-            
+
         self.memory.add_message(response)
         return response
 
