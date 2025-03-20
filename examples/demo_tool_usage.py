@@ -2,7 +2,8 @@ from camel.agents import ChatAgent
 from camel.memories import ChatHistoryMemory  # Corrected import path
 from camel.models import ModelFactory
 from camel.messages import BaseMessage
-from camel.tools.base_tool import BaseTool  # Corrected import path
+from camel.toolkits.base_tool import BaseTool  # Corrected import path
+from camel.memories.context_creators import LastKContextCreator
 
 
 class GreetingTool(BaseTool):  # pylint: disable=too-few-public-methods
@@ -27,7 +28,10 @@ def setup_tool_agent() -> ChatAgent:
     Returns:
         ChatAgent: Agent configured with greeting tool and memory
     """
-    memory = ChatHistoryMemory(window_size=10)
+    memory = ChatHistoryMemory(
+        window_size=10,
+        context_creator=LastKContextCreator(k=10)
+    )
     model = ModelFactory.create(
         model_platform="openai",
         model_type="gpt-4",
