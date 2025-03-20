@@ -1,5 +1,3 @@
-import pytest
-from camel.agents import ChatAgent
 from camel.messages import BaseMessage
 from examples.demo_tool_usage import GreetingTool, setup_tool_agent
 
@@ -19,7 +17,7 @@ def test_tool_usage_agent():
     assert "Hello from tool!" in response.content, "Tool output not found in response"
     assert "greeting_tool" in response.content, "Tool name not mentioned in response"
 
-class TestGreetingTool:
+class TestGreetingTool:  # pylint: disable=too-few-public-methods
     """Test suite for the GreetingTool functionality."""
     
     def test_tool_execution(self):
