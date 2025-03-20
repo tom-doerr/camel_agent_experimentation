@@ -3,7 +3,7 @@ import os
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
-from examples.demo_tool_usage import GreetingTool, setup_tool_agent
+from examples.demo_tool_usage import GreetingTool, setup_tool_agent, BaseMessage
 
 
 def test_tool_usage_agent():
