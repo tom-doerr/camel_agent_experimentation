@@ -97,7 +97,7 @@ class ChatAgent:
 
             response = BaseMessage("Assistant", "Hello World!", role_type="assistant")
 
-        except Exception as e:
+        except ValueError as e:  # More specific exception
             self.memory.add_message(
                 BaseMessage(
                     "System",
