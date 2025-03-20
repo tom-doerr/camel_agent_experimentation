@@ -39,7 +39,7 @@ class ChatAgent:
         delegate_workers: List[Any] = None,
     ):
         """Initialize a ChatAgent with shared memory capability
-        
+
         Args:
             memory: ChatHistoryMemory instance (can be shared between agents)
             tools: List of tool classes to register

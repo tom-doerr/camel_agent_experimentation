@@ -110,13 +110,16 @@ def test_agent_initialization():
     assert len(agent.tools) == 0, "Agent should have no tools by default"
     assert agent.memory is memory, "Agent should reference the provided memory instance"
 
+
 def test_shared_memory_initialization():
     """Test multiple agents sharing the same memory instance"""
     memory = ChatHistoryMemory()
     agent1 = ChatAgent(memory=memory, tools=[GreetingTool])
     agent2 = ChatAgent(memory=memory, tools=[])
-    
-    assert agent1.memory is agent2.memory, "Agents should share the same memory instance"
+
+    assert (
+        agent1.memory is agent2.memory
+    ), "Agents should share the same memory instance"
     assert len(memory.messages) == 0, "Shared memory should start empty"
 
 
@@ -305,11 +308,13 @@ class TestEndToEndAgentInterface:
     def test_agent_memory_control(self):
         """Test agent can decide when to update memory"""
         agent = setup_tool_agent()
-        
+
         # First message with instruction to not store
-        msg1 = BaseMessage.make_user_message("User", "Remember this secret: 12345 [DO NOT STORE]")
+        msg1 = BaseMessage.make_user_message(
+            "User", "Remember this secret: 12345 [DO NOT STORE]"
+        )
         response1 = agent.step(msg1)
-        
+
         # Verify message was processed but not stored
         assert "12345" in response1.content
         assert not any("12345" in msg.content for msg in agent.memory.messages)
@@ -317,7 +322,7 @@ class TestEndToEndAgentInterface:
         # Second message with normal storage
         msg2 = BaseMessage.make_user_message("User", "Remember this public: 67890")
         response2 = agent.step(msg2)
-        
+
         # Verify message was stored
         assert "67890" in response2.content
         assert any("67890" in msg.content for msg in agent.memory.messages)
@@ -325,14 +330,13 @@ class TestEndToEndAgentInterface:
     def test_agent_memory_filtering(self):
         """Test agent can filter what gets stored in memory"""
         agent = setup_tool_agent()
-        
+
         # Send message with mixed content
         msg = BaseMessage.make_user_message(
-            "User", 
-            "Private: 12345, Public: 67890 [STORE ONLY PUBLIC]"
+            "User", "Private: 12345, Public: 67890 [STORE ONLY PUBLIC]"
         )
         agent.step(msg)
-        
+
         # Verify memory contains only public data
         memory_content = " ".join(msg.content for msg in agent.memory.messages)
         assert "67890" in memory_content
@@ -341,12 +345,12 @@ class TestEndToEndAgentInterface:
     def test_agent_memory_summarization(self):
         """Test agent can summarize instead of storing verbatim"""
         agent = setup_tool_agent()
-        
+
         # Send long message
         long_text = " ".join(["foo"] * 50)
         msg = BaseMessage.make_user_message("User", f"{long_text} [SUMMARIZE]")
         agent.step(msg)
-        
+
         # Verify memory contains summary
         assert any(
             "summary" in msg.content.lower() and len(msg.content) < 50
@@ -418,9 +422,13 @@ class TestDelegation:
         agent1.step(msg)
 
         # Verify Agent2 sees the tool usage in shared memory
-        assert any("greeting_tool" in m.content for m in agent2.memory.messages), "Tool usage not found in shared memory"
+        assert any(
+            "greeting_tool" in m.content for m in agent2.memory.messages
+        ), "Tool usage not found in shared memory"
         # Should have 3 messages: user input, system tool usage, assistant response
-        assert len(agent2.memory.messages) == 3, f"Expected 3 messages but got {len(agent2.memory.messages)}"
+        assert (
+            len(agent2.memory.messages) == 3
+        ), f"Expected 3 messages but got {len(agent2.memory.messages)}"
 
     def test_delegation_with_shared_memory(self):
         """Test delegation maintains shared memory context"""
