@@ -239,10 +239,10 @@ class TestAgentInterfaceEndToEnd:
         agent = setup_tool_agent()
         user_msg = BaseMessage.make_user_message(
             "User",
-            "Use greeting_tool and disk_usage_tool then rate this text: 'Sample'",
+            "Use greeting_tool, disk_usage_tool and rating_tool on: 'Sample text'"
         )
         response = agent.step(user_msg)
-
+    
         # Verify all tools responded
         assert "greeting_tool" in response.content
         assert "disk_usage_tool" in response.content
@@ -301,14 +301,12 @@ class TestAgentInterfaceEndToEnd:
         agent = setup_tool_agent()
         user_msg = BaseMessage.make_user_message("User", "Do something impossible")
         response = agent.step(user_msg)
-
+    
         # Verify fallback response
-        response = agent.step(user_msg)
-
-        # Should fall back to default response
         assert "Hello World!" in response.content
         # Should record error in system messages
-        assert any("system" in msg.role_type for msg in agent.memory.messages)
+        assert any(msg.role_type == "system" and "error" in msg.content.lower() 
+                  for msg in agent.memory.messages), "Missing error system message"
 
 
 class TestDelegation:
