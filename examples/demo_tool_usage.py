@@ -46,7 +46,7 @@ class ChatAgent:
                 # Add self-reflection to memory
                 feedback = BaseMessage(
                     "System",
-                    f"Agent reflected on using {tool_name}: Successfully provided greeting",
+                    f"Agent reflected on using {tool_name}: Used {tool_name} successfully",
                     role_type="system",
                 )
                 self.memory.add_message(feedback)
