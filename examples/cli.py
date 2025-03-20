@@ -23,10 +23,10 @@ def main():
     """Chat with an AI agent - Choose a message or interactive mode"""
     agent = setup_tool_agent()
 
-    if args.message:
-        print(process_message(agent, args.message, args.verbose))
+    if message:
+        click.echo(process_message(agent, message, verbose))
     else:
-        print("How can I help you?")
+        click.echo("How can I help you?")
         while True:
             try:
                 message = input("> ")
