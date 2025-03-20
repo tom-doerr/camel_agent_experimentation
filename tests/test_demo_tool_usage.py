@@ -32,8 +32,6 @@ def test_tool_usage_agent():
 
 
 class TestGreetingTool:
-    """Test suite for the GreetingTool functionality."""
-
     def test_tool_properties(self):
         """Test tool metadata."""
         tool = GreetingTool()
