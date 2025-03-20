@@ -33,11 +33,11 @@ pytest tests/ -v
 ## Project Structure
 
 ```
-├── examples/
-│   ├── demo_tool_usage.py  # Main agent implementation
-│   ├── messages.py         # Base message class
-│   └── __init__.py
-├── tests/
-│   └── test_demo_tool_usage.py  # Integration tests
-└── README.md               # This file
+|-- examples/
+|   |-- demo_tool_usage.py  # Main agent implementation
+|   |-- messages.py         # Base message class
+|   `-- __init__.py
+|-- tests/
+|   `-- test_demo_tool_usage.py  # Integration tests
+`-- README.md               # This file
 ```
