@@ -292,6 +292,57 @@ class TestEndToEndAgentInterface:
             for msg in agent.memory.messages
         ), "Missing error system message"
 
+    def test_agent_memory_control(self):
+        """Test agent can decide when to update memory"""
+        agent = setup_tool_agent()
+        
+        # First message with instruction to not store
+        msg1 = BaseMessage.make_user_message("User", "Remember this secret: 12345 [DO NOT STORE]")
+        response1 = agent.step(msg1)
+        
+        # Verify message was processed but not stored
+        assert "12345" in response1.content
+        assert not any("12345" in msg.content for msg in agent.memory.messages)
+
+        # Second message with normal storage
+        msg2 = BaseMessage.make_user_message("User", "Remember this public: 67890")
+        response2 = agent.step(msg2)
+        
+        # Verify message was stored
+        assert "67890" in response2.content
+        assert any("67890" in msg.content for msg in agent.memory.messages)
+
+    def test_agent_memory_filtering(self):
+        """Test agent can filter what gets stored in memory"""
+        agent = setup_tool_agent()
+        
+        # Send message with mixed content
+        msg = BaseMessage.make_user_message(
+            "User", 
+            "Private: 12345, Public: 67890 [STORE ONLY PUBLIC]"
+        )
+        response = agent.step(msg)
+        
+        # Verify memory contains only public data
+        memory_content = " ".join(msg.content for msg in agent.memory.messages)
+        assert "67890" in memory_content
+        assert "12345" not in memory_content
+
+    def test_agent_memory_summarization(self):
+        """Test agent can summarize instead of storing verbatim"""
+        agent = setup_tool_agent()
+        
+        # Send long message
+        long_text = " ".join(["foo"] * 50)
+        msg = BaseMessage.make_user_message("User", f"{long_text} [SUMMARIZE]")
+        response = agent.step(msg)
+        
+        # Verify memory contains summary
+        assert any(
+            "summary" in msg.content.lower() and len(msg.content) < 50
+            for msg in agent.memory.messages
+        ), "Memory should contain summarized version"
+
 
 class TestDelegation:
     """Test agent-to-agent delegation"""

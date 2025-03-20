@@ -5,17 +5,27 @@ from examples.messages import BaseMessage
 
 # pylint: disable=too-few-public-methods
 class ChatHistoryMemory:
-    """Minimal memory implementation"""
+    """Memory implementation with storage control"""
 
     def __init__(self, window_size: int = 10):
         self.window_size = window_size
         self.messages: List[BaseMessage] = []
 
+    def should_store(self, message: BaseMessage) -> bool:
+        """Determine if message should be stored"""
+        # Default implementation - agents can override
+        if "[DO NOT STORE]" in message.content:
+            return False
+        if "[STORE ONLY PUBLIC]" in message.content:
+            return "Public:" in message.content
+        return True
+
     def add_message(self, message: BaseMessage) -> None:
-        """Add message to memory"""
-        self.messages.append(message)
-        if len(self.messages) > self.window_size:
-            self.messages.pop(0)
+        """Add message to memory if it passes filters"""
+        if self.should_store(message):
+            self.messages.append(message)
+            if len(self.messages) > self.window_size:
+                self.messages.pop(0)
 
 
 # pylint: disable=too-few-public-methods
