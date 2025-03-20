@@ -42,7 +42,7 @@ class ChatAgent:
                     role_type="assistant",
                 )
                 self.memory.add_message(response)
-                
+
                 # Add self-reflection to memory
                 feedback = BaseMessage(
                     "System",
