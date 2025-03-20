@@ -149,6 +149,38 @@ class TestDiskUsageTool:
         assert "%" in result
 
 
+class TestEndToEndAgentInteraction:
+    """Test full agent interaction flow from user input to tool usage"""
+    
+    def test_full_conversation_flow(self):
+        """Test complete conversation with multiple tool usages"""
+        agent = setup_tool_agent()
+        
+        # Start conversation
+        user_msg1 = BaseMessage.make_user_message(
+            "User", "Can you greet me and check disk space?"
+        )
+        response1 = agent.step(user_msg1)
+        
+        # Verify both tool responses are present
+        assert "Hello from tool!" in response1.content
+        assert "Disk Usage" in response1.content
+        assert "GB" in response1.content
+        
+        # Follow-up request
+        user_msg2 = BaseMessage.make_user_message(
+            "User", "Now rate the complexity of this text: 'The quick brown fox'"
+        )
+        response2 = agent.step(user_msg2)
+        
+        # Verify rating tool response
+        assert "Rating:" in response2.content
+        assert "/10" in response2.content
+        
+        # Verify conversation history maintained
+        assert len(agent.memory.messages) == 6, "Should have 2 user messages, 2 responses, and 2 system reflections"
+
+
 class TestDelegation:
     """Test agent-to-agent delegation"""
 
