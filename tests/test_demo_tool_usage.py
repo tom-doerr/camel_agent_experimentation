@@ -295,21 +295,12 @@ class TestAgentInterfaceEndToEnd:
         ], "Incorrect message sequence after mixed conversation"
 
     def test_error_handling_flow(self):
-        # Test error message contains structured information
+        """Test agent response to invalid requests and error metadata"""
         agent = setup_tool_agent()
         user_msg = BaseMessage.make_user_message("User", "Do something impossible")
         response = agent.step(user_msg)
         
-        # Verify error metadata
-        assert any(
-            "system" in msg.role_type and "fallback" in msg.content.lower()
-            for msg in agent.memory.messages
-        ), "Missing error metadata in system messages"
-
-    def test_error_handling_flow(self):
-        """Test agent response to invalid requests"""
-        agent = setup_tool_agent()
-        user_msg = BaseMessage.make_user_message("User", "Do something impossible")
+        # Verify fallback response
         response = agent.step(user_msg)
 
         # Should fall back to default response
