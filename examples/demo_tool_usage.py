@@ -50,8 +50,13 @@ class ChatAgent:
         self.tools = {tool.name: tool for tool in tools}
         self.delegate_workers = delegate_workers or []
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.performance_data = []
+        
     def step(self, message: BaseMessage) -> BaseMessage:
         """Process a message and return response"""
+        start_time = perf_counter()
         self.memory.add_message(message)
 
         # Check for delegation commands first
@@ -128,8 +133,24 @@ class ChatAgent:
                 role_type="assistant",
             )
 
+        response_time = perf_counter() - start_time
+        self.performance_data.append({
+            "response_time": response_time,
+            "tools_used": len(tool_responses),
+            "phrase_variation": getattr(message, "optimization_phrase", None)
+        })
         self.memory.add_message(response)
         return response
+
+    def calculate_performance_metrics(self, trials: int = 10) -> PerformanceMetrics:
+        """Calculate performance metrics from recent trials"""
+        recent_data = self.performance_data[-trials:] if self.performance_data else []
+        return PerformanceMetrics(
+            avg_response_time=statistics.mean(d["response_time"] for d in recent_data) if recent_data else 0.0,
+            tool_usage_count=sum(d["tools_used"] for d in recent_data),
+            trials=len(recent_data),
+            phrase_impact={}
+        )
 
 
 class BaseTool:
