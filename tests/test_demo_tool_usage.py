@@ -28,9 +28,7 @@ def test_tool_usage_agent():
     assert "greeting_tool" in response.content, "Tool name not mentioned in response"
 
     # Verify tool registration in agent
-    assert any(
-        tool.name == "greeting_tool" for tool in agent.tools
-    ), "Tool not registered with agent"
+    assert "greeting_tool" in agent.tools, "Tool not registered with agent"
 
 
 class TestGreetingTool:
