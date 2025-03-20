@@ -208,35 +208,60 @@ class TestEndToEndAgentInteraction:  # pylint: disable=too-few-public-methods
         )
 
 
-def test_full_agent_interaction():
-    """End-to-end test of agent receiving message and using appropriate tool"""
-    agent = setup_tool_agent()
+class TestAgentInterfaceEndToEnd:
+    """End-to-end tests for core agent interface behavior"""
 
-    # Send initial message
-    user_msg = BaseMessage.make_user_message(
-        "User",
-        "Please use disk_usage_tool and rating_tool on: 'The quick brown fox jumps over the lazy dog'",
-    )
-    response = agent.step(user_msg)
+    def test_tool_usage_response_flow(self):
+        """Test complete flow from user message to tool usage response"""
+        agent = setup_tool_agent()
+        user_msg = BaseMessage.make_user_message(
+            "User",
+            "Please use disk_usage_tool and rating_tool on: 'The quick brown fox'"
+        )
+        response = agent.step(user_msg)
 
-    # Verify tool outputs
-    assert "disk_usage_tool" in response.content
-    assert "GB" in response.content
-    assert "rating_tool" in response.content
-    assert "/10" in response.content
+        # Verify response contains both tool outputs
+        assert "disk_usage_tool" in response.content
+        assert "GB" in response.content
+        assert "rating_tool" in response.content
+        assert "/10" in response.content
 
-    # Verify memory persistence
-    assert (
-        len(agent.memory.messages) >= 4
-    ), "Should have user, response, and tool system messages"
+        # Verify memory contains all message types
+        message_types = {msg.role_type for msg in agent.memory.messages}
+        assert message_types == {"user", "assistant", "system"}, \
+            "Missing expected message types in memory"
 
-    # Verify message types
-    message_types = {msg.role_type for msg in agent.memory.messages}
-    assert {
-        "user",
-        "assistant",
-        "system",
-    } == message_types, "Missing expected message types"
+    def test_mixed_conversation_flow(self):
+        """Test interaction mixing tool usage and natural responses"""
+        agent = setup_tool_agent()
+        
+        # First message with tool request
+        tool_msg = BaseMessage.make_user_message("User", "Use greeting_tool")
+        tool_response = agent.step(tool_msg)
+        assert "Hello from tool!" in tool_response.content
+        
+        # Second message with natural request
+        natural_msg = BaseMessage.make_user_message("User", "Now just say hello")
+        natural_response = agent.step(natural_msg)
+        assert "Hello World!" in natural_response.content
+        
+        # Verify message sequence
+        message_sequence = [msg.role_type for msg in agent.memory.messages]
+        assert message_sequence == [
+            "user", "system", "assistant",  # First interaction
+            "user", "assistant"            # Second interaction
+        ], "Incorrect message sequence after mixed conversation"
+
+    def test_error_handling_flow(self):
+        """Test agent response to invalid requests"""
+        agent = setup_tool_agent()
+        user_msg = BaseMessage.make_user_message("User", "Do something impossible")
+        response = agent.step(user_msg)
+        
+        # Should fall back to default response
+        assert "Hello World!" in response.content
+        # Should record error in system messages
+        assert any("system" == msg.role_type for msg in agent.memory.messages)
 
 
 class TestDelegation:
