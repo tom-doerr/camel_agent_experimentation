@@ -37,6 +37,7 @@ class TestGreetingTool:
         tool = GreetingTool()
         assert tool.name == "greeting_tool"
         assert "friendly greeting" in tool.description
+
     """Test suite for the GreetingTool functionality."""
 
     def test_tool_execution(self):
