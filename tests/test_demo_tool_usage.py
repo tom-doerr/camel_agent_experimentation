@@ -11,6 +11,7 @@ sys.path.insert(0, examples_dir)
 from examples.demo_tool_usage import (
     GreetingTool,
     TextRatingTool,
+    DiskUsageTool,
     setup_tool_agent,
     ChatAgent,
     ChatHistoryMemory,
