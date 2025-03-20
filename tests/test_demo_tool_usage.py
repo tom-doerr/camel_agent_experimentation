@@ -31,6 +31,17 @@ def test_tool_usage_agent():
     assert "greeting_tool" in agent.tools, "Tool not registered with agent"
 
 
+def test_non_tool_usage_response():
+    """Test agent response when no tool is needed"""
+    agent = setup_tool_agent()
+    user_msg = BaseMessage.make_user_message(
+        role_name="User", content="Just say hello normally"
+    )
+    response = agent.step(user_msg)
+    assert "understanding" in response.content.lower(), "Should show default response"
+    assert "greeting_tool" not in response.content, "Should not mention tools"
+
+
 class TestGreetingTool:
     def test_tool_properties(self):
         """Test tool metadata."""
