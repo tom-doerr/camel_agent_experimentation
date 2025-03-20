@@ -360,36 +360,38 @@ class TestEndToEndAgentInterface:
 
 class TestPerformanceOptimization:
     """Test performance optimization through prompt variations"""
-    
+
     def __init__(self):
         """Initialize test case"""
         super().__init__()
         self.agent = None
-    
+
     def setup_method(self):
         """Test setup"""
         self.agent = setup_tool_agent()
-    
+
     def test_performance_optimization_flow(self):
         """Test basic performance measurement workflow"""
         agent = setup_tool_agent()
         test_phrases = ["Urgent:", "Important:", "Please respond quickly:"]
-        
+
         # Run optimization trials
         base_metrics = agent.calculate_performance_metrics(trials=5)
         optimized_metrics = agent.optimize_with_random_phrases(
-            phrases=test_phrases,
-            trials=5,
-            phrases_per_trial=2
+            phrases=test_phrases, trials=5, phrases_per_trial=2
         )
-        
+
         # Verify metrics collection
         assert base_metrics.avg_response_time > 0
         assert base_metrics.tool_usage_count >= 0
         assert optimized_metrics.avg_response_time > 0
-        
+
         # Verify optimization attempt (actual improvement may vary)
-        assert abs(optimized_metrics.avg_response_time - base_metrics.avg_response_time) < 0.5
+        assert (
+            abs(optimized_metrics.avg_response_time - base_metrics.avg_response_time)
+            < 0.5
+        )
+
 
 class TestDelegation:
     """Test agent-to-agent delegation"""

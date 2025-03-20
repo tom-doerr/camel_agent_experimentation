@@ -133,11 +133,13 @@ class ChatAgent:
             )
 
         response_time = perf_counter() - start_time
-        self.performance_data.append({
-            "response_time": response_time,
-            "tools_used": len(tool_responses),
-            "phrase_variation": getattr(message, "optimization_phrase", None)
-        })
+        self.performance_data.append(
+            {
+                "response_time": response_time,
+                "tools_used": len(tool_responses),
+                "phrase_variation": getattr(message, "optimization_phrase", None),
+            }
+        )
         self.memory.add_message(response)
         return response
 
@@ -145,10 +147,14 @@ class ChatAgent:
         """Calculate performance metrics from recent trials"""
         recent_data = self.performance_data[-trials:] if self.performance_data else []
         return PerformanceMetrics(
-            avg_response_time=statistics.mean(d["response_time"] for d in recent_data) if recent_data else 0.0,
+            avg_response_time=(
+                statistics.mean(d["response_time"] for d in recent_data)
+                if recent_data
+                else 0.0
+            ),
             tool_usage_count=sum(d["tools_used"] for d in recent_data),
             trials=len(recent_data),
-            phrase_impact={}
+            phrase_impact={},
         )
 
 
