@@ -485,20 +485,20 @@ class TestDelegation:
 
 class TestFileContextManagement:
     """Tests for agent file context management"""
-    
+
     def test_add_file_to_context(self):
         """Test agent can track files in its context"""
         agent = setup_tool_agent()
         agent.step(BaseMessage.make_user_message("User", "add file.txt"))
         assert "file.txt" in agent.context_files
-        
+
     def test_remove_file_from_context(self):
         """Test agent can remove files from context"""
         agent = setup_tool_agent()
         agent.step(BaseMessage.make_user_message("User", "add test.txt"))
         agent.step(BaseMessage.make_user_message("User", "remove test.txt"))
         assert "test.txt" not in agent.context_files
-        
+
     def test_context_persistence(self):
         """Test file context persists between messages"""
         agent = setup_tool_agent()
@@ -507,9 +507,11 @@ class TestFileContextManagement:
         # Subsequent message should maintain context
         agent.step(BaseMessage.make_user_message("User", "show files"))
         assert "data.csv" in agent.context_files
-        
+
     def test_remove_nonexistent_file(self):
         """Test removing non-existent file doesn't error"""
         agent = setup_tool_agent()
-        response = agent.step(BaseMessage.make_user_message("User", "remove missing.txt"))
+        response = agent.step(
+            BaseMessage.make_user_message("User", "remove missing.txt")
+        )
         assert "not found" in response.content.lower()

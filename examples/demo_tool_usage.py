@@ -57,7 +57,7 @@ class ChatAgent:
     def add_to_context(self, filename: str) -> None:
         """Add a file to agent's context"""
         self.context_files.add(filename)
-        
+
     def remove_from_context(self, filename: str) -> str:
         """Remove a file from agent's context"""
         if filename in self.context_files:
@@ -75,7 +75,7 @@ class ChatAgent:
             filename = message.content.split("add ", 1)[1].strip()
             self.add_to_context(filename)
             return BaseMessage("Assistant", f"Added {filename} to context", "assistant")
-            
+
         if message.content.startswith("remove "):
             filename = message.content.split("remove ", 1)[1].strip()
             result = self.remove_from_context(filename)
