@@ -1,6 +1,16 @@
 """Test command line interface for agent interaction"""
 
+import sys
+import os
+
+# Add project root and examples directory to path
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+examples_dir = os.path.join(project_root, "examples")
+sys.path.insert(0, project_root)
+sys.path.insert(0, examples_dir)
+
 from click.testing import CliRunner
+# pylint: disable=import-error,no-name-in-module
 from examples.cli import main
 
 
