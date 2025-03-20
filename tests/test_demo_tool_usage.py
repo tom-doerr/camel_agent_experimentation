@@ -91,8 +91,8 @@ def test_multi_step_conversation():
     message_types = [msg.role_type for msg in agent.memory.messages]
     assert message_types == [
         "user",
-        "assistant",
         "system",
+        "assistant",
         "user",
         "assistant",
     ], f"Unexpected message sequence: {message_types}"
