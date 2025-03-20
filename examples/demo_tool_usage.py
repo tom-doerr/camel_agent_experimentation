@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import Any, List, Optional
 import shutil
 from examples.messages import BaseMessage
 
@@ -160,11 +160,19 @@ def setup_tool_agent() -> ChatAgent:
     return ChatAgent(memory=memory, tools=[GreetingTool, TextRatingTool, DiskUsageTool])
 
 
+def cli_main(input_str: Optional[str] = None) -> str:
+    """Entry point for CLI execution"""
+    agent = setup_tool_agent()
+    if input_str:
+        msg = BaseMessage.make_user_message(role_name="User", content=input_str)
+        response = agent.step(msg)
+        return response.content
+    return ""
+
 if __name__ == "__main__":
-    demo_agent = setup_tool_agent()
     print("Demo: CAMEL Agent Tool Usage")
     user_input = BaseMessage.make_user_message(
         role_name="User", content="Please use the greeting tool to say hello"
     )
-    demo_response = demo_agent.step(user_input)
-    print(f"\nAgent Response:\n{demo_response.content}")
+    demo_response = cli_main(user_input.content)
+    print(f"\nAgent Response:\n{demo_response}")
