@@ -2,21 +2,27 @@ import sys
 import os
 
 # Add project root and examples directory to path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+examples_dir = os.path.join(project_root, "examples")
+sys.path.insert(0, project_root)
+sys.path.insert(0, examples_dir)
 
-from examples import (
+# pylint: disable=no-name-in-module,import-error
+from examples.demo_tool_usage import (
     GreetingTool,
+    TextRatingTool,
     setup_tool_agent,
     ChatAgent,
     ChatHistoryMemory,
-    BaseMessage
 )
+from examples.messages import BaseMessage
 
 
 def test_tool_presence():
-    """Test that the agent is initialized with the correct tool."""
+    """Test that the agent is initialized with the correct tools."""
     agent = setup_tool_agent()
     assert "greeting_tool" in agent.tools, "Greeting tool not registered"
+    assert "rating_tool" in agent.tools, "Rating tool not registered"
 
 
 def test_tool_usage_agent():
@@ -52,15 +58,15 @@ def test_non_tool_usage_response():
 def test_multi_step_conversation():
     """Test agent maintains conversation history across steps"""
     agent = setup_tool_agent()
-    
+
     # First message with tool usage
     msg1 = BaseMessage.make_user_message("User", "Use greeting tool")
     response1 = agent.step(msg1)
-    
+
     # Second message without tool
     msg2 = BaseMessage.make_user_message("User", "Now just say hi")
     response2 = agent.step(msg2)
-    
+
     # Verify both messages and responses are in memory
     assert len(agent.memory.messages) == 4, "Should have 2 user messages + 2 responses"
     assert "Hello from tool!" in response1.content
@@ -73,6 +79,21 @@ def test_agent_initialization():
     agent = ChatAgent(memory=memory, tools=[])
     assert isinstance(agent, ChatAgent), "Should create ChatAgent instance"
     assert len(agent.tools) == 0, "Agent should have no tools by default"
+
+
+class TestTextRatingTool:
+    def test_tool_properties(self):
+        """Test rating tool metadata."""
+        tool = TextRatingTool()
+        assert tool.name == "rating_tool"
+        assert "text complexity" in tool.description
+
+    def test_tool_execution(self):
+        """Test basic rating tool execution."""
+        tool = TextRatingTool()
+        result = tool.execute("Sample text")
+        assert "Rating:" in result
+        assert "/10" in result
 
 
 class TestGreetingTool:
