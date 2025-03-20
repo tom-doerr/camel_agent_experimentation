@@ -4,11 +4,7 @@ import os
 # Add project root and examples directory to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from examples import (
-    BaseMessage,
-    GreetingTool,
-    setup_tool_agent
-)
+from examples import BaseMessage, GreetingTool, setup_tool_agent
 
 
 def test_tool_presence():
