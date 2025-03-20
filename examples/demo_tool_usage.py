@@ -1,5 +1,5 @@
 from typing import Any, List
-from .messages import BaseMessage
+from examples.messages import BaseMessage
 
 
 # pylint: disable=too-few-public-methods
