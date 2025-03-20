@@ -53,7 +53,16 @@ class ChatAgent:
                 self.memory.add_message(feedback)
                 return response
 
-        response = BaseMessage("Assistant", "Hello World!", role_type="assistant")
+        # Handle missing context scenario
+        if len(message.content.strip()) < 5:  # Simple length-based context check
+            response = BaseMessage(
+                "Assistant",
+                "Could you please provide more details about your request?",
+                role_type="assistant"
+            )
+        else:
+            response = BaseMessage("Assistant", "Hello World!", role_type="assistant")
+            
         self.memory.add_message(response)
         return response
 

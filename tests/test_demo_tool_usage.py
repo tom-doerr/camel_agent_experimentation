@@ -55,8 +55,8 @@ def test_tool_usage_agent():
     ), "Action should be recorded in memory"
 
 
-def test_non_tool_usage_response():
-    """Test agent response when no tool is needed"""
+def test_non_tool_usage_response_with_sufficient_input():
+    """Test agent response when input has enough context"""
     agent = setup_tool_agent()
     user_msg = BaseMessage.make_user_message(
         role_name="User", content="Just say hello normally"
@@ -64,6 +64,16 @@ def test_non_tool_usage_response():
     response = agent.step(user_msg)
     assert "Hello World!" in response.content, "Should show hello world response"
     assert "greeting_tool" not in response.content, "Should not mention tools"
+
+def test_agent_requests_missing_context():
+    """Test agent asks for help when missing context"""
+    agent = setup_tool_agent()
+    user_msg = BaseMessage.make_user_message(
+        role_name="User", content="Hi"
+    )
+    response = agent.step(user_msg)
+    assert "more details" in response.content.lower(), "Should request more context"
+    assert "?" in response.content, "Should phrase as question"
 
 
 def test_multi_step_conversation():
