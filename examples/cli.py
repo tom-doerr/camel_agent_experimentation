@@ -1,6 +1,5 @@
 """Command line interface for interacting with the agent"""
 import argparse
-from typing import Optional
 from .demo_tool_usage import setup_tool_agent, ChatAgent
 from .messages import BaseMessage
 

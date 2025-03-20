@@ -1,8 +1,6 @@
 """Test command line interface for agent interaction"""
-import pytest
 from click.testing import CliRunner
-from examples.demo_tool_usage import setup_tool_agent
-from examples import cli
+from examples import cli, setup_tool_agent
 
 def test_cli_basic_execution():
     """Test basic CLI execution with a message"""
@@ -28,9 +26,6 @@ def test_cli_verbose_output():
 
 def test_cli_interactive_mode(capsys):
     """Test interactive mode session"""
-    # Simulate user input then exit
-    inputs = ["Hello", "use rating tool on this", "exit"]
-    
     # Get output and verify responses
     captured = capsys.readouterr()
     assert "How can I help you?" in captured.out
