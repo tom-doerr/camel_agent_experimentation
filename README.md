@@ -37,13 +37,13 @@ pytest tests/ -v
 
 ```
 |-- src/
-|   └── camel_agent/        # Package source code
+|   `-- camel_agent/        # Package source code
 |       |-- __init__.py
 |       |-- cli.py
 |       |-- demo_tool_usage.py
-|       └-- messages.py
+|       `-- messages.py
 |-- tests/                  # Integration tests
 |-- pyproject.toml          # Build configuration
 |-- setup.cfg               # Package metadata
-└-- README.md               # This file
+`-- README.md               # This file
 ```
