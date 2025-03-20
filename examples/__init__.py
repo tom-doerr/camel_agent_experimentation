@@ -1,10 +1,10 @@
 """Example modules package"""
 
 from .demo_tool_usage import (
-    GreetingTool, 
+    GreetingTool,
     setup_tool_agent,
     ChatAgent,
-    ChatHistoryMemory
+    ChatHistoryMemory,
 )
 from .messages import BaseMessage
 from . import demo_tool_usage, messages
@@ -13,8 +13,8 @@ __all__ = [
     "GreetingTool",
     "setup_tool_agent",
     "BaseMessage",
-    "ChatAgent", 
+    "ChatAgent",
     "ChatHistoryMemory",
     "demo_tool_usage",
-    "messages"
+    "messages",
 ]
