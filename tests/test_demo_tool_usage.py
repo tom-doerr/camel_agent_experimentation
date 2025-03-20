@@ -78,7 +78,9 @@ def test_multi_step_conversation():
     response2 = agent.step(msg2)
 
     # Verify both messages and responses are in memory
-    assert len(agent.memory.messages) == 5, "Should have 2 user messages + 2 responses + 1 system reflection"
+    assert (
+        len(agent.memory.messages) == 5
+    ), "Should have 2 user messages + 2 responses + 1 system reflection"
     assert "Hello from tool!" in response1.content
     assert "Hello World!" in response2.content
 
