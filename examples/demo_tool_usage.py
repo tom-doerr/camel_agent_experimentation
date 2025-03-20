@@ -41,6 +41,7 @@ class ChatAgent:
         delegate_workers: List[Any] = None,
     ):
         self.performance_data = []
+        self.context_files = set()
         """Initialize a ChatAgent with shared memory capability
 
         Args:
@@ -53,10 +54,32 @@ class ChatAgent:
         self.tools = {tool.name: tool for tool in tools}
         self.delegate_workers = delegate_workers or []
 
+    def add_to_context(self, filename: str) -> None:
+        """Add a file to agent's context"""
+        self.context_files.add(filename)
+        
+    def remove_from_context(self, filename: str) -> str:
+        """Remove a file from agent's context"""
+        if filename in self.context_files:
+            self.context_files.remove(filename)
+            return f"Removed {filename} from context"
+        return f"{filename} not found in context"
+
     def step(self, message: BaseMessage) -> BaseMessage:
         """Process a message and return response"""
         start_time = perf_counter()
         self.memory.add_message(message)
+
+        # Handle file context commands
+        if message.content.startswith("add "):
+            filename = message.content.split("add ", 1)[1].strip()
+            self.add_to_context(filename)
+            return BaseMessage("Assistant", f"Added {filename} to context", "assistant")
+            
+        if message.content.startswith("remove "):
+            filename = message.content.split("remove ", 1)[1].strip()
+            result = self.remove_from_context(filename)
+            return BaseMessage("Assistant", result, "assistant")
 
         # Check for delegation commands first
         if "delegate to" in message.content.lower():
