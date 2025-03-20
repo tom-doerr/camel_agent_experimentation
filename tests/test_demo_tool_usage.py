@@ -65,12 +65,11 @@ def test_non_tool_usage_response_with_sufficient_input():
     assert "Hello World!" in response.content, "Should show hello world response"
     assert "greeting_tool" not in response.content, "Should not mention tools"
 
+
 def test_agent_requests_missing_context():
     """Test agent asks for help when missing context"""
     agent = setup_tool_agent()
-    user_msg = BaseMessage.make_user_message(
-        role_name="User", content="Hi"
-    )
+    user_msg = BaseMessage.make_user_message(role_name="User", content="Hi")
     response = agent.step(user_msg)
     assert "more details" in response.content.lower(), "Should request more context"
     assert "?" in response.content, "Should phrase as question"
@@ -177,7 +176,9 @@ class TestDelegation:
         response = manager.step(task)
 
         assert "Hello from tool!" in response.content, "Worker should handle task"
-        assert "delegated to worker" in response.content.lower(), "Should mention delegation"
+        assert (
+            "delegated to worker" in response.content.lower()
+        ), "Should mention delegation"
 
     def test_subtask_delegation_with_feedback(self):
         """Test delegated subtask response is stored in manager memory"""
@@ -191,6 +192,12 @@ class TestDelegation:
         manager.step(task)
 
         # Verify both delegation and tool response are in memory
-        assert len(memory.messages) >= 3, "Should have task, delegation, and tool response"
-        assert any("Delegated to worker" in msg.content for msg in memory.messages), "Missing delegation record"
-        assert any("Hello from tool" in msg.content for msg in memory.messages), "Missing tool result in memory"
+        assert (
+            len(memory.messages) >= 3
+        ), "Should have task, delegation, and tool response"
+        assert any(
+            "Delegated to worker" in msg.content for msg in memory.messages
+        ), "Missing delegation record"
+        assert any(
+            "Hello from tool" in msg.content for msg in memory.messages
+        ), "Missing tool result in memory"
