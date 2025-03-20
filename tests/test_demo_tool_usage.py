@@ -11,6 +11,7 @@ def test_tool_presence():
     agent = setup_tool_agent()
     assert "greeting_tool" in agent.tools, "Greeting tool not registered"
 
+
 def test_tool_usage_agent():
     """Test that the agent can use a simple greeting tool."""
     # Setup
