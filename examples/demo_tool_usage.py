@@ -1,4 +1,5 @@
 from typing import Any, List, Optional
+from pathlib import Path
 import shutil
 import statistics
 from time import perf_counter
@@ -57,7 +58,7 @@ class ChatAgent:
     def add_to_context(self, filename: str) -> None:
         """Add a file to agent's context"""
         self.context_files.add(filename)
-        
+
     def remove_from_context(self, filename: str) -> str:
         """Remove a file from agent's context"""
         if filename in self.context_files:
@@ -65,21 +66,76 @@ class ChatAgent:
             return f"Removed {filename} from context"
         return f"{filename} not found in context"
 
+    def edit_file(self, filename: str, content: str) -> BaseMessage:
+        """Edit a file in the agent's context.
+        
+        Args:
+            filename: Name of file to edit (must be in context)
+            content: New content to write to the file
+            
+        Returns:
+            BaseMessage with status of operation
+        """
+        if filename not in self.context_files:
+            return BaseMessage("Assistant", f"{filename} not in context", "assistant")
+
+        try:
+            # Convert escaped newlines to real newlines
+            content = content.replace("\\n", "\n")
+            
+            # Ensure directory exists
+            Path(filename).parent.mkdir(parents=True, exist_ok=True)
+            
+            # Write content with proper encoding and error handling
+            with open(filename, "w", encoding="utf-8", errors="strict") as f:
+                f.write(content)
+                
+            return BaseMessage("Assistant", f"Updated {filename}", "assistant")
+            
+        except (IOError, OSError, UnicodeEncodeError) as e:
+            return BaseMessage(
+                "Assistant", 
+                f"Error editing {filename}: {str(e)}", 
+                "assistant"
+            )
+
+    def _handle_file_operations(self, message: BaseMessage) -> Optional[BaseMessage]:
+        """Handle file-related commands, return response or None if not a file command"""
+        content = message.content
+
+        if content.startswith("add "):
+            filename = content.split("add ", 1)[1].strip()
+            self.add_to_context(filename)
+            return BaseMessage("Assistant", f"Added {filename} to context", "assistant")
+
+        if content.startswith("remove "):
+            filename = content.split("remove ", 1)[1].strip()
+            result = self.remove_from_context(filename)
+            return BaseMessage("Assistant", result, "assistant")
+
+        if content.startswith("edit "):
+            parts = content.split(" ", 2)
+            if len(parts) < 3:
+                return BaseMessage(
+                    "Assistant",
+                    "Invalid edit format. Use: edit <filename> '<content>'",
+                    "assistant",
+                )
+            filename = parts[1].strip()
+            content = parts[2].strip("'\"")
+            return self.edit_file(filename, content)
+
+        return None
+
     def step(self, message: BaseMessage) -> BaseMessage:
         """Process a message and return response"""
         start_time = perf_counter()
         self.memory.add_message(message)
 
-        # Handle file context commands
-        if message.content.startswith("add "):
-            filename = message.content.split("add ", 1)[1].strip()
-            self.add_to_context(filename)
-            return BaseMessage("Assistant", f"Added {filename} to context", "assistant")
-            
-        if message.content.startswith("remove "):
-            filename = message.content.split("remove ", 1)[1].strip()
-            result = self.remove_from_context(filename)
-            return BaseMessage("Assistant", result, "assistant")
+        # Handle file operations first
+        file_response = self._handle_file_operations(message)
+        if file_response:
+            return file_response
 
         # Check for delegation commands first
         if "delegate to" in message.content.lower():

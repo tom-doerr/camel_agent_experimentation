@@ -485,20 +485,20 @@ class TestDelegation:
 
 class TestFileContextManagement:
     """Tests for agent file context management"""
-    
+
     def test_add_file_to_context(self):
         """Test agent can track files in its context"""
         agent = setup_tool_agent()
         agent.step(BaseMessage.make_user_message("User", "add file.txt"))
         assert "file.txt" in agent.context_files
-        
+
     def test_remove_file_from_context(self):
         """Test agent can remove files from context"""
         agent = setup_tool_agent()
         agent.step(BaseMessage.make_user_message("User", "add test.txt"))
         agent.step(BaseMessage.make_user_message("User", "remove test.txt"))
         assert "test.txt" not in agent.context_files
-        
+
     def test_context_persistence(self):
         """Test file context persists between messages"""
         agent = setup_tool_agent()
@@ -507,9 +507,66 @@ class TestFileContextManagement:
         # Subsequent message should maintain context
         agent.step(BaseMessage.make_user_message("User", "show files"))
         assert "data.csv" in agent.context_files
-        
+
     def test_remove_nonexistent_file(self):
         """Test removing non-existent file doesn't error"""
         agent = setup_tool_agent()
-        response = agent.step(BaseMessage.make_user_message("User", "remove missing.txt"))
+        response = agent.step(
+            BaseMessage.make_user_message("User", "remove missing.txt")
+        )
         assert "not found" in response.content.lower()
+
+    def test_edit_existing_file(self):
+        """Test agent can edit existing files"""
+        agent = setup_tool_agent()
+        # Create and edit file
+        agent.step(BaseMessage.make_user_message("User", "add test.txt"))
+        response = agent.step(
+            BaseMessage.make_user_message("User", "edit test.txt 'Hello World'")
+        )
+        assert "Updated test.txt" in response.content
+        with open("test.txt", encoding="utf-8") as f:
+            assert "Hello World" in f.read()
+
+    def test_edit_nonexistent_file(self):
+        """Test editing non-existent file returns error"""
+        agent = setup_tool_agent()
+        response = agent.step(
+            BaseMessage.make_user_message("User", "edit missing.txt 'content'")
+        )
+        assert "not in context" in response.content.lower()
+
+    def test_valid_file_edit(self):
+        """Test full valid edit workflow"""
+        agent = setup_tool_agent()
+        # Create file
+        agent.step(BaseMessage.make_user_message("User", "add test.txt"))
+        # Edit file
+        response = agent.step(
+            BaseMessage.make_user_message("User", "edit test.txt 'new content'")
+        )
+        assert "Updated test.txt" in response.content
+        # Verify file contents
+        with open("test.txt", encoding="utf-8") as f:
+            assert "new content" in f.read()
+
+    def test_invalid_edit_command(self):
+        """Test malformed edit command"""
+        agent = setup_tool_agent()
+        agent.step(BaseMessage.make_user_message("User", "add test.txt"))
+        response = agent.step(
+            BaseMessage.make_user_message("User", "edit test.txt")
+        )
+        assert "Invalid edit format" in response.content
+
+    def test_file_content_handling(self):
+        """Test special characters and newlines"""
+        agent = setup_tool_agent()
+        agent.step(BaseMessage.make_user_message("User", "add test.txt"))
+        content = "Line1\\nLine2\\nLine3"
+        response = agent.step(
+            BaseMessage.make_user_message("User", f"edit test.txt '{content}'")
+        )
+        assert "Updated" in response.content
+        with open("test.txt", encoding="utf-8") as f:
+            assert "Line1\nLine2\nLine3" in f.read()
