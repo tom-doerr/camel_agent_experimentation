@@ -41,6 +41,8 @@ def main(message=None, verbose=False):
     agent = setup_tool_agent()
 
     if message:
+        if not message.strip():
+            raise click.UsageError("Cannot send empty message")
         click.echo(process_message(agent, message, verbose))
     else:
         click.echo("How can I help you?")
