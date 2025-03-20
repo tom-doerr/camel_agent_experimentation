@@ -7,8 +7,10 @@ from .demo_tool_usage import (
     setup_tool_agent,
     ChatAgent,
     ChatHistoryMemory,
+    cli_main,
 )
 from .messages import BaseMessage
+from .cli import main
 
 __all__ = [
     "GreetingTool",
@@ -18,4 +20,6 @@ __all__ = [
     "BaseMessage",
     "ChatAgent",
     "ChatHistoryMemory",
+    "cli_main",
+    "main",
 ]
