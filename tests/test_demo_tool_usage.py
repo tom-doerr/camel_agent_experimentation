@@ -3,7 +3,9 @@ import os
 
 # Add project root and examples directory to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../examples")))
+sys.path.insert(
+    0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../examples"))
+)
 
 from demo_tool_usage import GreetingTool, setup_tool_agent
 from messages import BaseMessage

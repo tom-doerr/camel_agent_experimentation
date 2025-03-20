@@ -34,7 +34,7 @@ class ChatAgent:
         content_lower = message.content.lower()
         for tool_name, tool_cls in self.tools.items():
             # Split tool name into parts and check if any are in the message
-            if any(part in content_lower for part in tool_name.split('_')):
+            if any(part in content_lower for part in tool_name.split("_")):
                 tool_response = tool_cls().execute()
                 return BaseMessage(
                     "Assistant",
