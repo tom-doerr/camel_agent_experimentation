@@ -177,7 +177,9 @@ class TestEndToEndAgentInteraction:  # pylint: disable=too-few-public-methods
         assert (
             "disk_usage_tool" in response1.content and "Disk Usage" in response1.content
         ), "Disk check missing"
-        assert response1.content.count("Used") == 3, "Should show three 'Used' mentions (tool headers + disk usage)"
+        assert (
+            response1.content.count("Used") == 3
+        ), "Should show three 'Used' mentions (tool headers + disk usage)"
         assert "GB" in response1.content, "GB units not displayed"
         assert "greeting_tool" in response1.content, "Greeting tool name not mentioned"
         assert "disk_usage_tool" in response1.content, "Disk tool name not mentioned"
@@ -226,7 +228,7 @@ class TestAgentInterfaceEndToEnd:
         # Verify response chain
         assert "Hello from tool!" in response.content
         assert "delegated" in response.content.lower()
-        
+
         # Verify memory contains full workflow traces
         roles_present = {msg.role_type for msg in memory.messages}
         assert "system" in roles_present, "Missing system messages"
@@ -237,10 +239,10 @@ class TestAgentInterfaceEndToEnd:
         agent = setup_tool_agent()
         user_msg = BaseMessage.make_user_message(
             "User",
-            "Use greeting_tool and disk_usage_tool then rate this text: 'Sample'"
+            "Use greeting_tool and disk_usage_tool then rate this text: 'Sample'",
         )
         response = agent.step(user_msg)
-        
+
         # Verify all tools responded
         assert "greeting_tool" in response.content
         assert "disk_usage_tool" in response.content
@@ -299,7 +301,7 @@ class TestAgentInterfaceEndToEnd:
         agent = setup_tool_agent()
         user_msg = BaseMessage.make_user_message("User", "Do something impossible")
         response = agent.step(user_msg)
-        
+
         # Verify fallback response
         response = agent.step(user_msg)
 
