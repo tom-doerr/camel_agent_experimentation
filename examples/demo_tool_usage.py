@@ -28,6 +28,13 @@ class ChatAgent:
         tools: List[Any],
         delegate_workers: List[Any] = None,
     ):
+        """Initialize a ChatAgent with shared memory capability
+        
+        Args:
+            memory: ChatHistoryMemory instance (can be shared between agents)
+            tools: List of tool classes to register
+            delegate_workers: List of ChatAgents to delegate to
+        """
         self.memory = memory
         # Store tools by name with class references
         self.tools = {tool.name: tool for tool in tools}

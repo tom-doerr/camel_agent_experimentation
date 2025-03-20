@@ -345,3 +345,34 @@ class TestDelegation:
         assert any(
             "Hello from tool" in msg.content for msg in memory.messages
         ), "Missing tool result in memory"
+
+    def test_shared_memory_visibility(self):
+        """Test two agents sharing the same memory instance"""
+        shared_memory = ChatHistoryMemory()
+        agent1 = ChatAgent(memory=shared_memory, tools=[GreetingTool])
+        agent2 = ChatAgent(memory=shared_memory, tools=[])
+
+        # Agent1 uses a tool
+        msg = BaseMessage.make_user_message("User", "Use greeting tool")
+        agent1.step(msg)
+        
+        # Verify Agent2 sees the tool usage in shared memory
+        assert any("greeting_tool" in m.content for m in agent2.memory.messages)
+        assert len(agent2.memory.messages) == 4  # user, system, system, assistant
+
+    def test_delegation_with_shared_memory(self):
+        """Test delegation maintains shared memory context"""
+        shared_memory = ChatHistoryMemory()
+        worker = ChatAgent(memory=shared_memory, tools=[GreetingTool])
+        manager = ChatAgent(memory=shared_memory, tools=[], delegate_workers=[worker])
+
+        task = BaseMessage.make_user_message(
+            "Manager", "Delegate to worker: use greeting tool"
+        )
+        manager.step(task)
+
+        # Verify memory contains full workflow traces from both agents
+        message_contents = " ".join(m.content for m in shared_memory.messages)
+        assert "Delegate to worker" in message_contents
+        assert "Delegated to worker" in message_contents
+        assert "Hello from tool" in message_contents
