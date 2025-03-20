@@ -6,6 +6,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 
 from examples import (
     GreetingTool,
+    TextRatingTool,
     setup_tool_agent,
     ChatAgent,
     ChatHistoryMemory,
