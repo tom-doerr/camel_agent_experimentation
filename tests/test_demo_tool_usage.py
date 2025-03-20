@@ -211,26 +211,33 @@ class TestEndToEndAgentInteraction:  # pylint: disable=too-few-public-methods
 def test_full_agent_interaction():
     """End-to-end test of agent receiving message and using appropriate tool"""
     agent = setup_tool_agent()
-    
+
     # Send initial message
     user_msg = BaseMessage.make_user_message(
-        "User", 
-        "Please check disk space and rate this text: 'The quick brown fox jumps over the lazy dog'"
+        "User",
+        "Please check disk space and rate this text: 'The quick brown fox jumps over the lazy dog'",
     )
     response = agent.step(user_msg)
-    
+
     # Verify tool outputs
     assert "disk_usage_tool" in response.content
     assert "GB" in response.content
     assert "rating_tool" in response.content
     assert "/10" in response.content
-    
+
     # Verify memory persistence
-    assert len(agent.memory.messages) >= 4, "Should have user, response, and tool system messages"
-    
+    assert (
+        len(agent.memory.messages) >= 4
+    ), "Should have user, response, and tool system messages"
+
     # Verify message types
     message_types = {msg.role_type for msg in agent.memory.messages}
-    assert {'user', 'assistant', 'system'} == message_types, "Missing expected message types"
+    assert {
+        "user",
+        "assistant",
+        "system",
+    } == message_types, "Missing expected message types"
+
 
 class TestDelegation:
     """Test agent-to-agent delegation"""
