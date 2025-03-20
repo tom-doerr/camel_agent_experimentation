@@ -43,6 +43,12 @@ def test_tool_usage_agent():
     # Verify tool registration in agent
     assert "greeting_tool" in agent.tools, "Tool not registered with agent"
 
+    # Verify self-reflection is stored in memory
+    assert len(agent.memory.messages) >= 2, "Should have at least user message and response"
+    last_msg = agent.memory.messages[-1]
+    assert "greeting_tool" in last_msg.content, "Tool name should be in memory"
+    assert "Used greeting_tool" in last_msg.content, "Action should be recorded in memory"
+
 
 def test_non_tool_usage_response():
     """Test agent response when no tool is needed"""
