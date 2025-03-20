@@ -1,25 +1,25 @@
 """Test command line interface for agent interaction"""
 from click.testing import CliRunner
-import examples.cli as cli
+from examples.cli import main
 
 def test_cli_basic_execution():
     """Test basic CLI execution with a message"""
     runner = CliRunner()
-    result = runner.invoke(cli.main, ["--message", "Hello"])
+    result = runner.invoke(main, ["--message", "Hello"])
     assert "Hello World!" in result.output
     assert result.exit_code == 0
 
 def test_cli_tool_usage():
     """Test CLI execution that triggers a tool"""
     runner = CliRunner()
-    result = runner.invoke(cli.main, ["--message", "use greeting tool"])
+    result = runner.invoke(main, ["--message", "use greeting tool"])
     assert "Hello from tool!" in result.output
     assert result.exit_code == 0
 
 def test_cli_verbose_output():
     """Test verbose mode shows additional details"""
     runner = CliRunner()
-    result = runner.invoke(cli.main, ["--message", "hi", "--verbose"])
+    result = runner.invoke(main, ["--message", "hi", "--verbose"])
     assert "Hello World!" in result.output
     assert "System reflection" in result.output
     assert result.exit_code == 0
