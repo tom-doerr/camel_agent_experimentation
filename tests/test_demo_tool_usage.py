@@ -158,7 +158,7 @@ class TestDiskUsageTool:
 
 class TestEndToEndAgentInterface:
     """End-to-end tests for core agent interface behavior"""
-    
+
     def __init__(self):
         """Initialize test case"""
         super().__init__()
@@ -201,13 +201,13 @@ class TestEndToEndAgentInterface:
         """Test agent can combine multiple tool responses in one message"""
         user_msg = BaseMessage.make_user_message(
             "User",
-            "Use greeting_tool, disk_usage_tool and rating_tool on: 'Sample text'"
+            "Use greeting_tool, disk_usage_tool and rating_tool on: 'Sample text'",
         )
         response = self.agent.step(user_msg)
 
         # Verify all tools responded
         self.assert_tool_used(response, "greeting_tool")
-        self.assert_tool_used(response, "disk_usage_tool") 
+        self.assert_tool_used(response, "disk_usage_tool")
         self.assert_tool_used(response, "rating_tool")
 
     def test_delegation_workflow(self):
@@ -230,7 +230,6 @@ class TestEndToEndAgentInterface:
         roles_present = {msg.role_type for msg in memory.messages}
         assert "system" in roles_present, "Missing system messages"
         assert "assistant" in roles_present, "Missing assistant responses"
-
 
     def test_tool_usage_response_flow(self):
         """Test complete flow from user message to tool usage response"""
