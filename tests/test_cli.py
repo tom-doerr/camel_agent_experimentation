@@ -71,6 +71,11 @@ def test_cli_invalid_input():
     """Test empty message handling"""
     runner = CliRunner()
     result = runner.invoke(main, ["--message", ""])
-    assert "Received empty message" in result.output
-    assert "Error" in result.output  # Check Click's error formatting
-    assert result.exit_code == 2, f"Expected exit code 2 but got {result.exit_code}"
+    assert "Error: Received empty message" in result.output
+    assert result.exit_code == 2
+
+def test_cli_version():
+    """Test version output"""
+    runner = CliRunner()
+    result = runner.invoke(main, ["--version"])
+    assert "0.1.0" in result.output
