@@ -34,9 +34,10 @@ def test_cli_tool_usage():
 def test_cli_verbose_output():
     """Test verbose mode shows additional details"""
     runner = CliRunner()
-    result = runner.invoke(main, ["--message", "hi", "--verbose"])
+    result = runner.invoke(main, ["--message", "Hello", "--verbose"])
     assert "Hello World!" in result.output
     assert "System reflection" in result.output
+    assert "Insufficient context" not in result.output  # Verify valid input handling
     assert result.exit_code == 0
 
 
