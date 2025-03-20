@@ -14,9 +14,10 @@ from examples import (
 
 
 def test_tool_presence():
-    """Test that the agent is initialized with the correct tool."""
+    """Test that the agent is initialized with the correct tools."""
     agent = setup_tool_agent()
     assert "greeting_tool" in agent.tools, "Greeting tool not registered"
+    assert "rating_tool" in agent.tools, "Rating tool not registered"
 
 
 def test_tool_usage_agent():
@@ -73,6 +74,21 @@ def test_agent_initialization():
     agent = ChatAgent(memory=memory, tools=[])
     assert isinstance(agent, ChatAgent), "Should create ChatAgent instance"
     assert len(agent.tools) == 0, "Agent should have no tools by default"
+
+
+class TestTextRatingTool:
+    def test_tool_properties(self):
+        """Test rating tool metadata."""
+        tool = TextRatingTool()
+        assert tool.name == "rating_tool"
+        assert "text complexity" in tool.description
+
+    def test_tool_execution(self):
+        """Test basic rating tool execution."""
+        tool = TextRatingTool()
+        result = tool.execute("Sample text")
+        assert "Rating:" in result
+        assert "/10" in result
 
 
 class TestGreetingTool:

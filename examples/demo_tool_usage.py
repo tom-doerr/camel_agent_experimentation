@@ -35,7 +35,7 @@ class ChatAgent:
         for tool_name, tool_cls in self.tools.items():
             # Split tool name into parts and check if any are in the message
             if any(part in content_lower for part in tool_name.split("_")):
-                tool_response = tool_cls().execute()
+                tool_response = tool_cls().execute(message.content)
                 response = BaseMessage(
                     "Assistant",
                     f"Used {tool_name}: {tool_response}",
@@ -57,6 +57,20 @@ class BaseTool:
 
     def execute(self, *args, **kwargs) -> str:
         raise NotImplementedError
+
+
+class TextRatingTool(BaseTool):  # pylint: disable=too-few-public-methods,abstract-method
+    """Tool that analyzes text complexity and provides a rating."""
+    
+    name: str = "rating_tool"
+    description: str = "Useful for rating text complexity from 1-10 based on length"
+    
+    def execute(self, *args: str, **kwargs: str) -> str:
+        """Analyze text and return a rating."""
+        text = args[0] if args else ""
+        word_count = len(text.split())
+        rating = min(word_count // 10, 10)  # 1 point per 10 words up to 100
+        return f"Rating: {rating}/10 (based on {word_count} words)"
 
 
 class GreetingTool(BaseTool):  # pylint: disable=too-few-public-methods,abstract-method
@@ -84,7 +98,7 @@ def setup_tool_agent() -> ChatAgent:
         ChatAgent: Agent configured with greeting tool and memory
     """
     memory = ChatHistoryMemory(window_size=10)
-    return ChatAgent(memory=memory, tools=[GreetingTool])
+    return ChatAgent(memory=memory, tools=[GreetingTool, TextRatingTool])
 
 
 if __name__ == "__main__":
