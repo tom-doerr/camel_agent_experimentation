@@ -16,7 +16,7 @@ def test_cli_tool_usage():
     """Test CLI execution that triggers a tool"""
     runner = CliRunner()
     result = runner.invoke(main, ["--message", "use greeting tool"])
-    assert "Hello from tool!" in result.output 
+    assert "Hello from tool!" in result.output
     assert result.exit_code == 0
 
 

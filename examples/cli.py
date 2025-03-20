@@ -18,7 +18,9 @@ def process_message(agent: ChatAgent, message: str, verbose: bool = False) -> st
 
 @click.command()
 @click.option("--message", "-m", help="Direct message to send")
-@click.option("--verbose", "-v", is_flag=True, help="Show detailed processing information")
+@click.option(
+    "--verbose", "-v", is_flag=True, help="Show detailed processing information"
+)
 def main(message=None, verbose=False):
     """Chat with an AI agent - Choose a message or interactive mode"""
     agent = setup_tool_agent()
