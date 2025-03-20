@@ -24,14 +24,16 @@ def test_tool_usage_agent():
     # Verify tool usage
     assert "Hello from tool!" in response.content, "Tool output not found in response"
     assert "greeting_tool" in response.content, "Tool name not mentioned in response"
-    
+
     # Verify tool registration in agent
-    assert any(tool.name == "greeting_tool" for tool in agent.tools), "Tool not registered with agent"
+    assert any(
+        tool.name == "greeting_tool" for tool in agent.tools
+    ), "Tool not registered with agent"
 
 
 class TestGreetingTool:
     """Test suite for the GreetingTool functionality."""
-    
+
     def test_tool_properties(self):
         """Test tool metadata."""
         tool = GreetingTool()
