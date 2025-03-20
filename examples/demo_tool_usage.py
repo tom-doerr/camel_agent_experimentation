@@ -86,16 +86,18 @@ class TextRatingTool(
 
 class DiskUsageTool(BaseTool):  # pylint: disable=too-few-public-methods,abstract-method
     """Tool that checks disk usage statistics.
-    
+
     Attributes:
         name: The name of the tool displayed to the agent
         description: Help text for when to use this tool
     """
-    
+
     name: str = "disk_usage_tool"
     description: str = "Useful for checking disk space usage and available capacity"
-    
-    def execute(self, *args: str, **kwargs: str) -> str:  # pylint: disable=unused-argument
+
+    def execute(
+        self, *args: str, **kwargs: str
+    ) -> str:  # pylint: disable=unused-argument
         """Execute the disk usage check and return formatted statistics."""
         usage = shutil.disk_usage("/")
         percent_used = (usage.used / usage.total) * 100
