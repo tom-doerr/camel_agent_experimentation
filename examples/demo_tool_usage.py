@@ -8,11 +8,12 @@ from camel.agents.tools import BaseTool
 # pylint: disable=too-few-public-methods
 class GreetingTool(BaseTool):
     """Tool that returns a fixed greeting message.
-    
+
     Attributes:
         name (str): The name of the tool displayed to the agent
         description (str): Help text for the agent about when to use this tool
     """
+
     name = "greeting_tool"
     description = "Useful for when you need to generate a friendly greeting"
 
@@ -26,7 +27,7 @@ def setup_tool_agent():
     memory = ChatHistoryMemory(window_size=10)
     model = ModelFactory.create(
         model_platform="openai",
-        model_config_dict={"api_key": "sk-test-key", "model": "gpt-4"}
+        model_config_dict={"api_key": "sk-test-key", "model": "gpt-4"},
     )
     agent = ChatAgent(model=model, memory=memory, tools=[GreetingTool()])
     return agent
