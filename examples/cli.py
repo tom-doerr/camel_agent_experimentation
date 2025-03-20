@@ -42,7 +42,7 @@ def main(message=None, verbose=False):
 
     if message:  # Direct message mode
         if not message.strip():
-            raise click.UsageError("Received empty message")
+            raise click.UsageError("Message cannot be empty when using --message")
         click.echo(process_message(agent, message, verbose))
     else:
         click.echo("How can I help you?")

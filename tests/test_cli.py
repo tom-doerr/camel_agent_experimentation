@@ -71,7 +71,7 @@ def test_cli_invalid_input():
     """Test empty message handling"""
     runner = CliRunner()
     result = runner.invoke(main, ["--message", ""])
-    assert "Error: Received empty message" in result.output
+    assert "Error: Message cannot be empty when using --message" in result.output
     assert result.exit_code == 2
 
 
