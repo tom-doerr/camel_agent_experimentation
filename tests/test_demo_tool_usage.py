@@ -2,9 +2,12 @@ import sys
 import os
 
 # Add project root and examples directory to path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+examples_dir = os.path.join(project_root, "examples")
+sys.path.insert(0, project_root)
+sys.path.insert(0, examples_dir)
 
-# pylint: disable=no-name-in-module
+# pylint: disable=no-name-in-module,import-error
 from examples.demo_tool_usage import (
     GreetingTool,
     TextRatingTool,
