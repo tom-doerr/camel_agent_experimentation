@@ -87,10 +87,14 @@ def test_multi_step_conversation():
     msg2 = BaseMessage.make_user_message("User", "Now just say hi")
     response2 = agent.step(msg2)
 
-    # Verify both messages and responses are in memory
-    assert (
-        len(agent.memory.messages) == 5
-    ), "Should have 2 user messages + 2 responses + 1 system reflection"
+    # Verify message sequence and types
+    message_types = [msg.role_type for msg in agent.memory.messages]
+    assert message_types == [
+        'user', 'assistant', 'system', 
+        'user', 'assistant'
+    ], f"Unexpected message sequence: {message_types}"
+    
+    # Verify response content
     assert "Hello from tool!" in response1.content
     assert "Hello World!" in response2.content
 
@@ -162,9 +166,10 @@ class TestEndToEndAgentInteraction:  # pylint: disable=too-few-public-methods
         )
         response1 = agent.step(user_msg1)
 
-        # Verify both tool responses are present
-        assert "Hello from tool!" in response1.content, "Greeting missing from response"
-        assert "Disk Usage" in response1.content, "Disk check missing from response"
+        # Verify combined tool responses
+        assert "greeting_tool" in response1.content and "Hello from tool!" in response1.content, "Greeting missing"
+        assert "disk_usage_tool" in response1.content and "Disk Usage" in response1.content, "Disk check missing"
+        assert response1.content.count("Used") == 2, "Should show two tool usages"
         assert "GB" in response1.content, "GB units not displayed"
         assert "greeting_tool" in response1.content, "Greeting tool name not mentioned"
         assert "disk_usage_tool" in response1.content, "Disk tool name not mentioned"
