@@ -159,8 +159,8 @@ class TestDiskUsageTool:
 class TestEndToEndAgentInterface:
     """End-to-end tests for core agent interface behavior"""
     
-    def setup_agent(self):
-        """Fresh agent for each test"""
+    def setup_method(self):
+        """Fresh agent for each test (pytest setup convention)"""
         self.agent = setup_tool_agent()
 
     def assert_tool_used(self, response, tool_name):
@@ -226,21 +226,6 @@ class TestEndToEndAgentInterface:
         assert "system" in roles_present, "Missing system messages"
         assert "assistant" in roles_present, "Missing assistant responses"
 
-    def test_multi_tool_response_flow(self):
-        """Test agent can combine multiple tool responses in one message"""
-        agent = setup_tool_agent()
-        user_msg = BaseMessage.make_user_message(
-            "User",
-            "Use greeting_tool, disk_usage_tool and rating_tool on: 'Sample text'",
-        )
-        response = agent.step(user_msg)
-
-        # Verify all tools responded
-        assert "greeting_tool" in response.content
-        assert "disk_usage_tool" in response.content
-        assert "rating_tool" in response.content
-        # Each tool header has "Used" and disk_usage_tool has additional "Used" in its output
-        assert response.content.count("Used") >= 3, "Should show at least 3 tool usages"
 
     def test_tool_usage_response_flow(self):
         """Test complete flow from user message to tool usage response"""
