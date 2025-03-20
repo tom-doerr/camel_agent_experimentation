@@ -76,30 +76,27 @@ class ChatAgent:
             with open(filename, "w", encoding="utf-8") as f:
                 f.write(content)
             return BaseMessage("Assistant", f"Updated {filename}", "assistant")
-        except Exception as e:
+        except (IOError, OSError) as e:
             return BaseMessage(
                 "Assistant", f"Error editing {filename}: {str(e)}", "assistant"
             )
 
-    def step(self, message: BaseMessage) -> BaseMessage:
-        """Process a message and return response"""
-        start_time = perf_counter()
-        self.memory.add_message(message)
-
-        # Handle file context commands
-        if message.content.startswith("add "):
-            filename = message.content.split("add ", 1)[1].strip()
+    def _handle_file_operations(self, message: BaseMessage) -> Optional[BaseMessage]:
+        """Handle file-related commands, return response or None if not a file command"""
+        content = message.content
+        
+        if content.startswith("add "):
+            filename = content.split("add ", 1)[1].strip()
             self.add_to_context(filename)
             return BaseMessage("Assistant", f"Added {filename} to context", "assistant")
-
-        if message.content.startswith("remove "):
-            filename = message.content.split("remove ", 1)[1].strip()
+            
+        if content.startswith("remove "):
+            filename = content.split("remove ", 1)[1].strip()
             result = self.remove_from_context(filename)
             return BaseMessage("Assistant", result, "assistant")
-
-        # Handle file editing commands
-        if message.content.startswith("edit "):
-            parts = message.content.split(" ", 2)
+            
+        if content.startswith("edit "):
+            parts = content.split(" ", 2)
             if len(parts) < 3:
                 return BaseMessage(
                     "Assistant",
@@ -109,6 +106,18 @@ class ChatAgent:
             filename = parts[1].strip()
             content = parts[2].strip("'\"")
             return self.edit_file(filename, content)
+            
+        return None
+
+    def step(self, message: BaseMessage) -> BaseMessage:
+        """Process a message and return response"""
+        start_time = perf_counter()
+        self.memory.add_message(message)
+
+        # Handle file operations first
+        file_response = self._handle_file_operations(message)
+        if file_response:
+            return file_response
 
         # Check for delegation commands first
         if "delegate to" in message.content.lower():
