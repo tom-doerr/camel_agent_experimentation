@@ -39,8 +39,15 @@ def test_non_tool_usage_response():
         role_name="User", content="Just say hello normally"
     )
     response = agent.step(user_msg)
-    assert "understanding" in response.content.lower(), "Should show default response"
+    assert "Hello World!" in response.content, "Should show hello world response"
     assert "greeting_tool" not in response.content, "Should not mention tools"
+
+def test_agent_initialization():
+    """Test basic agent creation with empty tools"""
+    memory = ChatHistoryMemory(window_size=5)
+    agent = ChatAgent(memory=memory, tools=[])
+    assert isinstance(agent, ChatAgent), "Should create ChatAgent instance"
+    assert len(agent.tools) == 0, "Agent should have no tools by default"
 
 
 class TestGreetingTool:

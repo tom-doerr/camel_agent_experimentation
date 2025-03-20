@@ -42,7 +42,7 @@ class ChatAgent:
                     role_type="assistant",
                 )
 
-        return BaseMessage("Assistant", "I need help understanding the request")
+        return BaseMessage("Assistant", "Hello World!")
 
 
 class BaseTool:
