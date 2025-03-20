@@ -203,6 +203,7 @@ def cli_main(input_str: Optional[str] = None) -> str:
         return response.content
     return ""
 
+
 if __name__ == "__main__":
     print("Demo: CAMEL Agent Tool Usage")
     user_input = BaseMessage.make_user_message(
