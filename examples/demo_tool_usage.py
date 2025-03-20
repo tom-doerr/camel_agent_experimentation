@@ -22,14 +22,28 @@ class ChatHistoryMemory:
 class ChatAgent:
     """Minimal agent implementation with tool support"""
 
-    def __init__(self, memory: ChatHistoryMemory, tools: List[Any]):
+    def __init__(self, memory: ChatHistoryMemory, tools: List[Any], delegate_workers: List[Any] = None):
         self.memory = memory
         # Store tools by name with class references
         self.tools = {tool.name: tool for tool in tools}
+        self.delegate_workers = delegate_workers or []
 
     def step(self, message: BaseMessage) -> BaseMessage:
         """Process a message and return response"""
         self.memory.add_message(message)
+
+        # Check for delegation commands first
+        if "delegate to" in message.content.lower():
+            for worker in self.delegate_workers:
+                # Pass the task directly to worker agent
+                worker_response = worker.step(message)
+                response = BaseMessage(
+                    "Assistant",
+                    f"Delegated to worker: {worker_response.content}",
+                    role_type="assistant",
+                )
+                self.memory.add_message(response)
+                return response
 
         # Check if any tool name is mentioned in the message
         content_lower = message.content.lower()
@@ -53,7 +67,16 @@ class ChatAgent:
                 self.memory.add_message(feedback)
                 return response
 
-        response = BaseMessage("Assistant", "Hello World!", role_type="assistant")
+        # Handle missing context scenario
+        if len(message.content.strip()) < 5:  # Simple length-based context check
+            response = BaseMessage(
+                "Assistant",
+                "Could you please provide more details about your request?",
+                role_type="assistant"
+            )
+        else:
+            response = BaseMessage("Assistant", "Hello World!", role_type="assistant")
+            
         self.memory.add_message(response)
         return response
 

@@ -55,8 +55,8 @@ def test_tool_usage_agent():
     ), "Action should be recorded in memory"
 
 
-def test_non_tool_usage_response():
-    """Test agent response when no tool is needed"""
+def test_non_tool_usage_response_with_sufficient_input():
+    """Test agent response when input has enough context"""
     agent = setup_tool_agent()
     user_msg = BaseMessage.make_user_message(
         role_name="User", content="Just say hello normally"
@@ -64,6 +64,16 @@ def test_non_tool_usage_response():
     response = agent.step(user_msg)
     assert "Hello World!" in response.content, "Should show hello world response"
     assert "greeting_tool" not in response.content, "Should not mention tools"
+
+def test_agent_requests_missing_context():
+    """Test agent asks for help when missing context"""
+    agent = setup_tool_agent()
+    user_msg = BaseMessage.make_user_message(
+        role_name="User", content="Hi"
+    )
+    response = agent.step(user_msg)
+    assert "more details" in response.content.lower(), "Should request more context"
+    assert "?" in response.content, "Should phrase as question"
 
 
 def test_multi_step_conversation():
@@ -138,3 +148,49 @@ class TestDiskUsageTool:
         assert "Used" in result
         assert "Free" in result
         assert "%" in result
+
+
+class TestDelegation:
+    """Test agent-to-agent delegation"""
+
+    def test_agent_creation_with_delegation(self):
+        """Test agent can be initialized with delegation ability"""
+        memory = ChatHistoryMemory()
+        worker = ChatAgent(memory=memory, tools=[])
+        manager = ChatAgent(memory=memory, tools=[], delegate_workers=[worker])
+
+        assert hasattr(manager, "delegate_workers"), "Manager should have workers list"
+        assert len(manager.delegate_workers) == 1, "Manager should have 1 worker"
+        assert isinstance(
+            manager.delegate_workers[0], ChatAgent
+        ), "Worker should be agent"
+
+    def test_simple_delegation(self):
+        """Test manager can delegate task to worker"""
+        memory = ChatHistoryMemory()
+        worker = ChatAgent(memory=memory, tools=[GreetingTool])  # Pass class reference
+        manager = ChatAgent(memory=memory, tools=[], delegate_workers=[worker])
+
+        task = BaseMessage.make_user_message(
+            "Manager", "Delegate to worker: use greeting tool"
+        )
+        response = manager.step(task)
+
+        assert "Hello from tool!" in response.content, "Worker should handle task"
+        assert "delegated to worker" in response.content.lower(), "Should mention delegation"
+
+    def test_subtask_delegation_with_feedback(self):
+        """Test delegated subtask response is stored in manager memory"""
+        memory = ChatHistoryMemory()
+        worker = ChatAgent(memory=memory, tools=[GreetingTool])
+        manager = ChatAgent(memory=memory, tools=[], delegate_workers=[worker])
+
+        task = BaseMessage.make_user_message(
+            "Manager", "Delegate to worker: use greeting tool"
+        )
+        manager.step(task)
+
+        # Verify both delegation and tool response are in memory
+        assert len(memory.messages) >= 3, "Should have task, delegation, and tool response"
+        assert any("Delegated to worker" in msg.content for msg in memory.messages), "Missing delegation record"
+        assert any("Hello from tool" in msg.content for msg in memory.messages), "Missing tool result in memory"
