@@ -158,7 +158,7 @@ class TestDelegation:
     def test_simple_delegation(self):
         """Test manager can delegate task to worker"""
         memory = ChatHistoryMemory()
-        worker = ChatAgent(memory=memory, tools=[GreetingTool()])
+        worker = ChatAgent(memory=memory, tools=[GreetingTool])  # Pass class reference
         manager = ChatAgent(memory=memory, tools=[], delegate_workers=[worker])
 
         task = BaseMessage.make_user_message(
@@ -167,6 +167,20 @@ class TestDelegation:
         response = manager.step(task)
 
         assert "Hello from tool!" in response.content, "Worker should handle task"
-        assert (
-            "delegated to worker" in response.content.lower()
-        ), "Should mention delegation"
+        assert "delegated to worker" in response.content.lower(), "Should mention delegation"
+
+    def test_subtask_delegation_with_feedback(self):
+        """Test delegated subtask response is stored in manager memory"""
+        memory = ChatHistoryMemory()
+        worker = ChatAgent(memory=memory, tools=[GreetingTool])
+        manager = ChatAgent(memory=memory, tools=[], delegate_workers=[worker])
+
+        task = BaseMessage.make_user_message(
+            "Manager", "Delegate to worker: use greeting tool"
+        )
+        manager.step(task)
+
+        # Verify both delegation and tool response are in memory
+        assert len(memory.messages) >= 3, "Should have task, delegation, and tool response"
+        assert any("Delegated to worker" in msg.content for msg in memory.messages), "Missing delegation record"
+        assert any("Hello from tool" in msg.content for msg in memory.messages), "Missing tool result in memory"
