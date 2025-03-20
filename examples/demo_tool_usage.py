@@ -2,8 +2,8 @@ from camel.agents import ChatAgent
 from camel.memories import ChatHistoryMemory  # Corrected import path
 from camel.models import ModelFactory
 from camel.messages import BaseMessage
-from camel.toolkits.base_tool import BaseTool  # Corrected import path
-from camel.memories.context_creators import LastKContextCreator
+from camel.tools.base_tool import BaseTool  # Corrected import path
+from camel.memory.context_creators import LastKContextCreator
 
 
 class GreetingTool(BaseTool):  # pylint: disable=too-few-public-methods
