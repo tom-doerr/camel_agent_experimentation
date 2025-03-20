@@ -170,8 +170,11 @@ class TestEndToEndAgentInteraction:  # pylint: disable=too-few-public-methods
         assert "disk_usage_tool" in response1.content, "Disk tool name not mentioned"
 
         # Verify memory contains both tool usages
-        tool_uses = [msg.content for msg in agent.memory.messages 
-                   if "Used" in msg.content and "tool" in msg.content]
+        tool_uses = [
+            msg.content
+            for msg in agent.memory.messages
+            if "Used" in msg.content and "tool" in msg.content
+        ]
         assert len(tool_uses) == 2, "Should have 2 tool usage records in memory"
 
         # Follow-up request

@@ -53,19 +53,21 @@ class ChatAgent:
         # Check if any tool name is mentioned in the message
         content_lower = message.content.lower()
         tool_responses = []
-        
+
         for tool_name, tool_cls in self.tools.items():
             # Split tool name into parts and check if any are in the message
             if any(part in content_lower for part in tool_name.split("_")):
                 tool_response = tool_cls().execute(message.content)
                 tool_responses.append(f"Used {tool_name}: {tool_response}")
-                
+
                 # Add self-reflection to memory
-                self.memory.add_message(BaseMessage(
-                    "System",
-                    f"Agent reflected on using {tool_name}: Used {tool_name} successfully",
-                    role_type="system",
-                ))
+                self.memory.add_message(
+                    BaseMessage(
+                        "System",
+                        f"Agent reflected on using {tool_name}: Used {tool_name} successfully",
+                        role_type="system",
+                    )
+                )
 
         if tool_responses:
             response = BaseMessage(
