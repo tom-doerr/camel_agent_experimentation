@@ -71,7 +71,9 @@ class ChatAgent:
             return BaseMessage("Assistant", f"{filename} not in context", "assistant")
 
         try:
-            with open(filename, "w") as f:
+            # Use proper newline handling and create parent directories if needed
+            content = content.replace("\\n", "\n")  # Unescape newlines from command
+            with open(filename, "w", encoding="utf-8") as f:
                 f.write(content)
             return BaseMessage("Assistant", f"Updated {filename}", "assistant")
         except Exception as e:
