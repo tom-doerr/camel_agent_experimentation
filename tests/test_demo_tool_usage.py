@@ -149,7 +149,7 @@ class TestDiskUsageTool:
         assert "%" in result
 
 
-class TestEndToEndAgentInteraction:
+class TestEndToEndAgentInteraction:  # pylint: disable=too-few-public-methods
     """Test full agent interaction flow from user input to tool usage"""
     
     def test_full_conversation_flow(self):
