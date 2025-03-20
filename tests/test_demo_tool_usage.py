@@ -4,13 +4,13 @@ import os
 # Add project root and examples directory to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from examples.demo_tool_usage import (
+from examples import (
     GreetingTool,
     setup_tool_agent,
     ChatAgent,
     ChatHistoryMemory,
+    BaseMessage
 )
-from examples.messages import BaseMessage
 
 
 def test_tool_presence():
