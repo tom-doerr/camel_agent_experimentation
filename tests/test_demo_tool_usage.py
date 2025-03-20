@@ -523,7 +523,7 @@ class TestFileContextManagement:
         agent.step(BaseMessage.make_user_message("User", "add test.txt"))
         response = agent.step(BaseMessage.make_user_message("User", "edit test.txt 'Hello World'"))
         assert "Updated test.txt" in response.content
-        with open("test.txt") as f:
+        with open("test.txt", encoding='utf-8') as f:
             assert "Hello World" in f.read()
 
     def test_edit_nonexistent_file(self):
