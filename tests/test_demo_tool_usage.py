@@ -159,6 +159,11 @@ class TestDiskUsageTool:
 class TestEndToEndAgentInterface:
     """End-to-end tests for core agent interface behavior"""
     
+    def __init__(self):
+        """Initialize test case"""
+        super().__init__()
+        self.agent = None
+
     def setup_method(self):
         """Fresh agent for each test (pytest setup convention)"""
         self.agent = setup_tool_agent()
