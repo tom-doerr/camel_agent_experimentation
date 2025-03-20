@@ -35,7 +35,11 @@ class ChatAgent:
         for tool_name, tool_cls in self.tools.items():
             if tool_name in content_lower:
                 tool_response = tool_cls().execute()
-                return BaseMessage("Assistant", f"Used {tool_name}: {tool_response}", role_type="assistant")
+                return BaseMessage(
+                    "Assistant",
+                    f"Used {tool_name}: {tool_response}",
+                    role_type="assistant",
+                )
 
         return BaseMessage("Assistant", "I need help understanding the request")
 
