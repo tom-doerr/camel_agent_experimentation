@@ -1,4 +1,5 @@
 from typing import Any, List, Optional
+from pathlib import Path
 import shutil
 import statistics
 from time import perf_counter
@@ -66,19 +67,36 @@ class ChatAgent:
         return f"{filename} not found in context"
 
     def edit_file(self, filename: str, content: str) -> BaseMessage:
-        """Edit a file in the agent's context"""
+        """Edit a file in the agent's context.
+        
+        Args:
+            filename: Name of file to edit (must be in context)
+            content: New content to write to the file
+            
+        Returns:
+            BaseMessage with status of operation
+        """
         if filename not in self.context_files:
             return BaseMessage("Assistant", f"{filename} not in context", "assistant")
 
         try:
-            # Use proper newline handling and create parent directories if needed
-            content = content.replace("\\n", "\n")  # Unescape newlines from command
-            with open(filename, "w", encoding="utf-8") as f:
+            # Convert escaped newlines to real newlines
+            content = content.replace("\\n", "\n")
+            
+            # Ensure directory exists
+            Path(filename).parent.mkdir(parents=True, exist_ok=True)
+            
+            # Write content with proper encoding and error handling
+            with open(filename, "w", encoding="utf-8", errors="strict") as f:
                 f.write(content)
+                
             return BaseMessage("Assistant", f"Updated {filename}", "assistant")
-        except (IOError, OSError) as e:
+            
+        except (IOError, OSError, UnicodeEncodeError) as e:
             return BaseMessage(
-                "Assistant", f"Error editing {filename}: {str(e)}", "assistant"
+                "Assistant", 
+                f"Error editing {filename}: {str(e)}", 
+                "assistant"
             )
 
     def _handle_file_operations(self, message: BaseMessage) -> Optional[BaseMessage]:

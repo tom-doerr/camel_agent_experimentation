@@ -534,4 +534,39 @@ class TestFileContextManagement:
         response = agent.step(
             BaseMessage.make_user_message("User", "edit missing.txt 'content'")
         )
-        assert "not found" in response.content.lower()
+        assert "not in context" in response.content.lower()
+
+    def test_valid_file_edit(self):
+        """Test full valid edit workflow"""
+        agent = setup_tool_agent()
+        # Create file
+        agent.step(BaseMessage.make_user_message("User", "add test.txt"))
+        # Edit file
+        response = agent.step(
+            BaseMessage.make_user_message("User", "edit test.txt 'new content'")
+        )
+        assert "Updated test.txt" in response.content
+        # Verify file contents
+        with open("test.txt", encoding="utf-8") as f:
+            assert "new content" in f.read()
+
+    def test_invalid_edit_command(self):
+        """Test malformed edit command"""
+        agent = setup_tool_agent()
+        agent.step(BaseMessage.make_user_message("User", "add test.txt"))
+        response = agent.step(
+            BaseMessage.make_user_message("User", "edit test.txt")
+        )
+        assert "Invalid edit format" in response.content
+
+    def test_file_content_handling(self):
+        """Test special characters and newlines"""
+        agent = setup_tool_agent()
+        agent.step(BaseMessage.make_user_message("User", "add test.txt"))
+        content = "Line1\\nLine2\\nLine3"
+        response = agent.step(
+            BaseMessage.make_user_message("User", f"edit test.txt '{content}'")
+        )
+        assert "Updated" in response.content
+        with open("test.txt", encoding="utf-8") as f:
+            assert "Line1\nLine2\nLine3" in f.read()
