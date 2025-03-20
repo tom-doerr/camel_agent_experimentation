@@ -355,7 +355,7 @@ class TestDelegation:
         # Agent1 uses a tool
         msg = BaseMessage.make_user_message("User", "Use greeting tool")
         agent1.step(msg)
-        
+
         # Verify Agent2 sees the tool usage in shared memory
         assert any("greeting_tool" in m.content for m in agent2.memory.messages)
         assert len(agent2.memory.messages) == 4  # user, system, system, assistant
