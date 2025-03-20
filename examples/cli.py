@@ -6,7 +6,16 @@ from .messages import BaseMessage
 
 
 def process_message(agent: ChatAgent, message: str, verbose: bool = False) -> str:
-    """Process a single message through the agent"""
+    """Process a single message through the agent
+    
+    Args:
+        agent: Configured ChatAgent instance
+        message: User input message
+        verbose: Show system reflections if True
+        
+    Returns:
+        str: Formatted response string
+    """
     if not message.strip():
         raise click.UsageError("Received empty message")
     user_msg = BaseMessage.make_user_message(role_name="User", content=message)
