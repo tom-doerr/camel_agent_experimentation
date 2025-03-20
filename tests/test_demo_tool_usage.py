@@ -216,7 +216,7 @@ class TestAgentInterfaceEndToEnd:
         agent = setup_tool_agent()
         user_msg = BaseMessage.make_user_message(
             "User",
-            "Please use disk_usage_tool and rating_tool on: 'The quick brown fox'"
+            "Please use disk_usage_tool and rating_tool on: 'The quick brown fox'",
         )
         response = agent.step(user_msg)
 
@@ -228,28 +228,34 @@ class TestAgentInterfaceEndToEnd:
 
         # Verify memory contains all message types
         message_types = {msg.role_type for msg in agent.memory.messages}
-        assert message_types == {"user", "assistant", "system"}, \
-            "Missing expected message types in memory"
+        assert message_types == {
+            "user",
+            "assistant",
+            "system",
+        }, "Missing expected message types in memory"
 
     def test_mixed_conversation_flow(self):
         """Test interaction mixing tool usage and natural responses"""
         agent = setup_tool_agent()
-        
+
         # First message with tool request
         tool_msg = BaseMessage.make_user_message("User", "Use greeting_tool")
         tool_response = agent.step(tool_msg)
         assert "Hello from tool!" in tool_response.content
-        
+
         # Second message with natural request
         natural_msg = BaseMessage.make_user_message("User", "Now just say hello")
         natural_response = agent.step(natural_msg)
         assert "Hello World!" in natural_response.content
-        
+
         # Verify message sequence
         message_sequence = [msg.role_type for msg in agent.memory.messages]
         assert message_sequence == [
-            "user", "system", "assistant",  # First interaction
-            "user", "assistant"            # Second interaction
+            "user",
+            "system",
+            "assistant",  # First interaction
+            "user",
+            "assistant",  # Second interaction
         ], "Incorrect message sequence after mixed conversation"
 
     def test_error_handling_flow(self):
@@ -257,7 +263,7 @@ class TestAgentInterfaceEndToEnd:
         agent = setup_tool_agent()
         user_msg = BaseMessage.make_user_message("User", "Do something impossible")
         response = agent.step(user_msg)
-        
+
         # Should fall back to default response
         assert "Hello World!" in response.content
         # Should record error in system messages
