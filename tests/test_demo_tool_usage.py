@@ -49,6 +49,24 @@ def test_non_tool_usage_response():
     assert "greeting_tool" not in response.content, "Should not mention tools"
 
 
+def test_multi_step_conversation():
+    """Test agent maintains conversation history across steps"""
+    agent = setup_tool_agent()
+    
+    # First message with tool usage
+    msg1 = BaseMessage.make_user_message("User", "Use greeting tool")
+    response1 = agent.step(msg1)
+    
+    # Second message without tool
+    msg2 = BaseMessage.make_user_message("User", "Now just say hi")
+    response2 = agent.step(msg2)
+    
+    # Verify both messages and responses are in memory
+    assert len(agent.memory.messages) == 4, "Should have 2 user messages + 2 responses"
+    assert "Hello from tool!" in response1.content
+    assert "Hello World!" in response2.content
+
+
 def test_agent_initialization():
     """Test basic agent creation with empty tools"""
     memory = ChatHistoryMemory(window_size=5)

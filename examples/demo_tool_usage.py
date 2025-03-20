@@ -36,13 +36,17 @@ class ChatAgent:
             # Split tool name into parts and check if any are in the message
             if any(part in content_lower for part in tool_name.split("_")):
                 tool_response = tool_cls().execute()
-                return BaseMessage(
+                response = BaseMessage(
                     "Assistant",
                     f"Used {tool_name}: {tool_response}",
                     role_type="assistant",
                 )
+                self.memory.add_message(response)
+                return response
 
-        return BaseMessage("Assistant", "Hello World!")
+        response = BaseMessage("Assistant", "Hello World!", role_type="assistant")
+        self.memory.add_message(response)
+        return response
 
 
 class BaseTool:
