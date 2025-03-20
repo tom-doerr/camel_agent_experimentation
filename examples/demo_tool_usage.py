@@ -54,7 +54,7 @@ class ChatAgent:
         content_lower = message.content.lower()
         tool_responses = []
 
-        # Prioritize exact tool name matches first
+        # Collect all exact tool matches first
         for tool_name, tool_cls in self.tools.items():
             if tool_name in content_lower:
                 tool_response = tool_cls().execute(message.content)
@@ -66,7 +66,6 @@ class ChatAgent:
                         role_type="system",
                     )
                 )
-                continue  # Skip partial matches if exact match found
 
         # If no exact matches, check for partial matches
         if not tool_responses:
@@ -91,15 +90,26 @@ class ChatAgent:
             self.memory.add_message(response)
             return response
 
-        # Handle missing context scenario
-        if len(message.content.strip()) < 5:  # Simple length-based context check
+        # Handle errors and missing context
+        try:
+            if len(message.content.strip()) < 5:
+                raise ValueError("Insufficient context")
+                
+            response = BaseMessage("Assistant", "Hello World!", role_type="assistant")
+            
+        except Exception as e:
+            self.memory.add_message(
+                BaseMessage(
+                    "System",
+                    f"Error processing request: {str(e)}",
+                    role_type="system",
+                )
+            )
             response = BaseMessage(
                 "Assistant",
                 "Could you please provide more details about your request?",
                 role_type="assistant",
             )
-        else:
-            response = BaseMessage("Assistant", "Hello World!", role_type="assistant")
 
         self.memory.add_message(response)
         return response
