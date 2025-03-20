@@ -8,7 +8,7 @@ from camel.memory.context_creators import LastKContextCreator
 
 class GreetingTool(BaseTool):  # pylint: disable=too-few-public-methods
     """Tool that returns a fixed greeting message.
-    
+
     Attributes:
         name: The name of the tool displayed to the agent
         description: Help text for the agent about when to use this tool
@@ -17,20 +17,21 @@ class GreetingTool(BaseTool):  # pylint: disable=too-few-public-methods
     name: str = "greeting_tool"
     description: str = "Useful for when you need to generate a friendly greeting"
 
-    def execute(self, *args: str, **kwargs: str) -> str:  # pylint: disable=unused-argument
+    def execute(
+        self, *args: str, **kwargs: str
+    ) -> str:  # pylint: disable=unused-argument
         """Execute the greeting tool and return a fixed message."""
         return "Hello from tool!"
 
 
 def setup_tool_agent() -> ChatAgent:
     """Initialize and configure a ChatAgent with greeting tool support.
-    
+
     Returns:
         ChatAgent: Agent configured with greeting tool and memory
     """
     memory = ChatHistoryMemory(
-        window_size=10,
-        context_creator=LastKContextCreator(k=10)
+        window_size=10, context_creator=LastKContextCreator(k=10)
     )
     model = ModelFactory.create(
         model_platform="openai",
