@@ -65,6 +65,18 @@ class ChatAgent:
             return f"Removed {filename} from context"
         return f"{filename} not found in context"
 
+    def edit_file(self, filename: str, content: str) -> BaseMessage:
+        """Edit a file in the agent's context"""
+        if filename not in self.context_files:
+            return BaseMessage("Assistant", f"{filename} not in context", "assistant")
+        
+        try:
+            with open(filename, "w") as f:
+                f.write(content)
+            return BaseMessage("Assistant", f"Updated {filename}", "assistant")
+        except Exception as e:
+            return BaseMessage("Assistant", f"Error editing {filename}: {str(e)}", "assistant")
+
     def step(self, message: BaseMessage) -> BaseMessage:
         """Process a message and return response"""
         start_time = perf_counter()
@@ -80,6 +92,15 @@ class ChatAgent:
             filename = message.content.split("remove ", 1)[1].strip()
             result = self.remove_from_context(filename)
             return BaseMessage("Assistant", result, "assistant")
+        
+        # Handle file editing commands
+        if message.content.startswith("edit "):
+            parts = message.content.split(" ", 2)
+            if len(parts) < 3:
+                return BaseMessage("Assistant", "Invalid edit format. Use: edit <filename> '<content>'", "assistant")
+            filename = parts[1].strip()
+            content = parts[2].strip("'\"")
+            return self.edit_file(filename, content)
 
         # Check for delegation commands first
         if "delegate to" in message.content.lower():
