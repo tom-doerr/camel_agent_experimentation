@@ -1,6 +1,8 @@
 from typing import Any, List, Optional
 import shutil
-from examples.messages import BaseMessage
+import statistics
+from time import perf_counter
+from examples.messages import BaseMessage, PerformanceMetrics
 
 
 # pylint: disable=too-few-public-methods
@@ -38,6 +40,7 @@ class ChatAgent:
         tools: List[Any],
         delegate_workers: List[Any] = None,
     ):
+        self.performance_data = []
         """Initialize a ChatAgent with shared memory capability
 
         Args:
@@ -50,10 +53,6 @@ class ChatAgent:
         self.tools = {tool.name: tool for tool in tools}
         self.delegate_workers = delegate_workers or []
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.performance_data = []
-        
     def step(self, message: BaseMessage) -> BaseMessage:
         """Process a message and return response"""
         start_time = perf_counter()

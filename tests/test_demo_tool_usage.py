@@ -361,6 +361,10 @@ class TestEndToEndAgentInterface:
 class TestPerformanceOptimization:
     """Test performance optimization through prompt variations"""
     
+    def setup_method(self):
+        """Test setup"""
+        self.agent = setup_tool_agent()
+    
     def test_performance_optimization_flow(self):
         """Test basic performance measurement workflow"""
         agent = setup_tool_agent()

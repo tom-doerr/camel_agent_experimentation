@@ -1,9 +1,7 @@
 """Core message class for agent communication"""
 
 from dataclasses import dataclass
-from time import perf_counter
-from typing import List, Dict, Optional
-import statistics
+from typing import Dict
 
 
 @dataclass
