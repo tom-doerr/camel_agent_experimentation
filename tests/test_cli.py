@@ -10,6 +10,7 @@ sys.path.insert(0, project_root)
 sys.path.insert(0, examples_dir)
 
 from click.testing import CliRunner
+
 # pylint: disable=import-error,no-name-in-module
 from examples.cli import main
 

@@ -19,16 +19,19 @@ def process_message(agent: ChatAgent, message: str, verbose: bool = False) -> st
 @click.command()
 @click.option("--message", "-m", help="Direct message to send to the agent")
 @click.option(
-    "--verbose", "-v", is_flag=True, help="Show detailed processing information including system reflections"
+    "--verbose",
+    "-v",
+    is_flag=True,
+    help="Show detailed processing information including system reflections",
 )
 @click.version_option(version="0.1.0", prog_name="Agent CLI")
 def main(message=None, verbose=False):
     """Chat with an AI agent that can use tools
-    
+
     Run in either direct message mode or interactive conversation mode.
-    
+
     Examples:
-    
+
     \b
     $ python -m examples.cli --message "Hello"
     $ python -m examples.cli --verbose --message "Check disk usage"
