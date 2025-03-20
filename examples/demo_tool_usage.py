@@ -22,7 +22,12 @@ class ChatHistoryMemory:
 class ChatAgent:
     """Minimal agent implementation with tool support"""
 
-    def __init__(self, memory: ChatHistoryMemory, tools: List[Any], delegate_workers: List[Any] = None):
+    def __init__(
+        self,
+        memory: ChatHistoryMemory,
+        tools: List[Any],
+        delegate_workers: List[Any] = None,
+    ):
         self.memory = memory
         # Store tools by name with class references
         self.tools = {tool.name: tool for tool in tools}
@@ -47,36 +52,65 @@ class ChatAgent:
 
         # Check if any tool name is mentioned in the message
         content_lower = message.content.lower()
-        for tool_name, tool_cls in self.tools.items():
-            # Split tool name into parts and check if any are in the message
-            if any(part in content_lower for part in tool_name.split("_")):
-                tool_response = tool_cls().execute(message.content)
-                response = BaseMessage(
-                    "Assistant",
-                    f"Used {tool_name}: {tool_response}",
-                    role_type="assistant",
-                )
-                self.memory.add_message(response)
+        tool_responses = []
 
-                # Add self-reflection to memory
-                feedback = BaseMessage(
+        # Collect all exact tool matches first
+        for tool_name, tool_cls in self.tools.items():
+            if tool_name in content_lower:
+                tool_response = tool_cls().execute(message.content)
+                tool_responses.append(f"Used {tool_name}: {tool_response}")
+                self.memory.add_message(
+                    BaseMessage(
+                        "System",
+                        f"Agent used {tool_name}: {tool_response}",
+                        role_type="system",
+                    )
+                )
+
+        # If no exact matches, check for partial matches
+        if not tool_responses:
+            for tool_name, tool_cls in self.tools.items():
+                if any(part in content_lower for part in tool_name.split("_")):
+                    tool_response = tool_cls().execute(message.content)
+                    tool_responses.append(f"Used {tool_name}: {tool_response}")
+                    self.memory.add_message(
+                        BaseMessage(
+                            "System",
+                            f"Agent used {tool_name}: {tool_response}",
+                            role_type="system",
+                        )
+                    )
+
+        if tool_responses:
+            response = BaseMessage(
+                "Assistant",
+                "\n".join(tool_responses),
+                role_type="assistant",
+            )
+            self.memory.add_message(response)
+            return response
+
+        # Handle errors and missing context
+        try:
+            if len(message.content.strip()) < 5:
+                raise ValueError("Insufficient context")
+
+            response = BaseMessage("Assistant", "Hello World!", role_type="assistant")
+
+        except ValueError as e:  # More specific exception
+            self.memory.add_message(
+                BaseMessage(
                     "System",
-                    f"Agent reflected on using {tool_name}: Used {tool_name} successfully",
+                    f"Error processing request: {str(e)}",
                     role_type="system",
                 )
-                self.memory.add_message(feedback)
-                return response
-
-        # Handle missing context scenario
-        if len(message.content.strip()) < 5:  # Simple length-based context check
+            )
             response = BaseMessage(
                 "Assistant",
                 "Could you please provide more details about your request?",
-                role_type="assistant"
+                role_type="assistant",
             )
-        else:
-            response = BaseMessage("Assistant", "Hello World!", role_type="assistant")
-            
+
         self.memory.add_message(response)
         return response
 
