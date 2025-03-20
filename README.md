@@ -1,28 +1,30 @@
-# CAMEL Agent Tool Usage Demo
+# CAMEL Agent Python Package
 
-### Overview 
-A minimal implementation of a conversational agent with tool usage capabilities.
+### Overview
+A properly packaged Python implementation of the CAMEL agent with tool usage capabilities.
 
 ## Features
 
-- Basic chat agent with conversation memory
-- Tool system integration
-- Greeting tool demonstration
-- Automated tests for tool usage scenarios
+- Proper Python package structure
+- Versioned releases
+- CLI entry point
+- Automated test suite
+- Chat agent with conversation memory
+- Extensible tool system
 
 ## Installation
 
 ```bash
 python -m venv venv
 source venv/bin/activate
-pip install -r requirements.txt
+pip install -e .
 ```
 
 ## Usage
 
-Run the demo:
+Run the demo agent:
 ```bash
-python examples/demo_tool_usage.py
+camel-agent
 ```
 
 ## Running Tests
@@ -34,11 +36,14 @@ pytest tests/ -v
 ## Project Structure
 
 ```
-|-- examples/
-|   |-- demo_tool_usage.py  # Main agent implementation
-|   |-- messages.py         # Base message class
-|   `-- __init__.py
-|-- tests/
-|   `-- test_demo_tool_usage.py  # Integration tests
+|-- src/
+|   `-- camel_agent/        # Package source code
+|       |-- __init__.py
+|       |-- cli.py
+|       |-- demo_tool_usage.py
+|       `-- messages.py
+|-- tests/                  # Integration tests
+|-- pyproject.toml          # Build configuration
+|-- setup.cfg               # Package metadata
 `-- README.md               # This file
 ```
